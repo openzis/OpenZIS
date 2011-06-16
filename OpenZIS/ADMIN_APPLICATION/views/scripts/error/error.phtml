@@ -1,0 +1,4 @@
+<?php 
+if ($this->msg != 'Not Ajax Request') {
+?>{"success":false, errors:{reason:"<?php echo $this->msg ?>"}}<?php
+}

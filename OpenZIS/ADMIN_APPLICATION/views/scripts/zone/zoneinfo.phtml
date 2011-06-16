@@ -1,0 +1,36 @@
+{"success":true,
+<?php
+
+$agents = $this->agents;
+$zone   = $this->zone;
+$openZisPushHandler = $this->openZisPushHandler;
+
+echo '"zone":['.Zend_Json::encode($zone).']';
+echo ',"openZisPushHandler":['.Zend_Json::encode($openZisPushHandler).']';
+echo ',"agents":[';
+$size = count($agents);
+$counter = 1;
+foreach($agents as $agent){
+	echo '{';
+	echo '
+		  "agentId":"'.$agent->agentId.'",
+		  "agentDesc":"'.$agent->agentDesc.'",
+		  "sourceId":"'.$agent->sourceId.'",
+		  "password":"'.$agent->password.'",
+		  "sleeping":"'.$agent->sleeping.'",
+		  "username":"'.$agent->username.'",
+		  "status":"'.$agent->status.'",
+		  "numMessages":"'.($agent->numPushMessages + $agent->numReceivedMessages).'"
+		  ';
+	if($counter == $size){
+		echo '}';
+	}
+	else{
+		echo '},';
+	}
+	$counter++;
+}
+echo '],';
+
+//echo '"admin":['.Zend_Json::encode($this->admin).']';
+echo '}';

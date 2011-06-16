@@ -1,0 +1,317 @@
+<!-- 
+	DataModel WSDL
+	
+	  The DataModel Service interface is supported by both the ZIS (mandatory) 
+	  and PushMode Agents (optional).  
+	  
+	  There is a single Port Type, and it is bound to SOAP 1.1. The Service has its URL address 
+	  set to the anonymous URI.The developer need only set this address to the actual URL that the 
+	  service will be deployed at and this WSDL file will be complete.  It is recommended that this
+	  URL be identical to that of all other SIF Web Service interfaces supported by the implementation 
+	  (ZIS or PUSH Mode Agent) it encapsulates.
+	  
+	  Clients invoke DataModel service operations to to post Events, make Query and Extended Query requests, 
+	  and (in the case of Object Providers) to supply Query and Extended Query responses. They encapsulate
+	  the complete set of CRUD messages used by Agents and the ZIS to support access to all 
+	  SIF Object Data in the Zone.
+	  
+	  Namespaces:
+	  tns:  DataModelWSDL
+	  comm: SIF Common WSDL Messages
+	  sift: Transport XSD  (SIFHeader)
+	  sifm: Messaging XSD (independent of Data Model)
+	  
+-->
+
+<definitions
+	name="DataModel"
+	targetNamespace="http://www.sifassociation.org/contract/DataModel/2.x"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:tns="http://www.sifassociation.org/contract/DataModel/2.x"
+	
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+		
+	xmlns:comm="http://www.sifassociation.org/contract/Common/2.x" 
+	xmlns:sift="http://www.sifassociation.org/transport/soap/2.x"
+	xmlns:sifm="http://www.sifassociation.org/message/soap/2.x"
+	xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"
+		
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+	>
+	
+		
+	<documentation>Version 2.5</documentation>
+	
+	<!-- Import Common WSDL with messages -->
+	
+	<import namespace="http://www.sifassociation.org/contract/Common/2.x"
+		location="Common-7.wsdl"></import>
+	
+	<types>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://www.sifassociation.org/contract/DataModel/2.x"
+			xmlns="http://www.sifassociation.org/contract/DataModel/2.x"
+			elementFormDefault="qualified">
+			<xs:import namespace="http://www.sifassociation.org/transport/soap/2.x" 
+				schemaLocation="Transport-1.xsd"></xs:import>
+			<xs:import namespace="http://www.sifassociation.org/message/soap/2.x" 
+				schemaLocation="Messaging-1.xsd"></xs:import>
+			
+			<!-- The following imports may have to be done to satisfy tools which don't have these standard namespaces prestored:
+				soap-env, wsaw 
+				
+				<xs:import namespace="http://schemas.xmlsoap.org/soap/envelope/"
+				schemaLocation="http://schemas.xmlsoap.org/soap/envelope/"></xs:import>
+				<xs:import namespace="http://www.w3.org/2006/05/addressing/wsdl"
+				schemaLocation="http://www.w3.org/2007/02/addressing/metadata/ws-addr-metadata.xsd"></xs:import> 
+			-->			
+			
+		</xs:schema>
+		
+		
+		<xs:annotation>
+			<xs:documentation>
+			The following operations are supported by the DataModel Port
+			
+			   Event
+			   
+			   Query
+			   ExtendedQuery
+			   QueryResults
+			   ExtendedQueryResults
+			   
+			   CancelRequests
+			   
+			   DataModelError (when receiving a rejection of a Request instead of
+			   the expected response).  A SOAP Fault is a TransportError
+			   
+			</xs:documentation>
+		</xs:annotation>
+		
+	</types>
+
+	<portType name="ptDataModel">
+		
+		<operation name="Event">
+			<input name="PostEvent" message="comm:Event"></input>
+			<output name="EventStatus" message="comm:Status"></output>
+			<fault
+				wsaw:Action="http://www.sifassociation.org/contract/DataModel/2.x/EventFault"
+				name="EventError" message="comm:TransportError">
+			</fault>
+		</operation>
+		
+		<operation name="Query">
+			<input name="QueryRequest" message="comm:Query"></input>
+			<output name="QueryStatus" message="comm:Status"></output>
+			<fault
+				wsaw:Action="http://www.sifassociation.org/contract/DataModel/2.x/QueryFault"
+				name="QueryError" message="comm:TransportError">
+			</fault>
+		</operation>
+		
+		<operation name="ExtendedQuery">
+			<input name="ExtendedQueryRequest" message="comm:ExtendedQuery"></input>
+			<output name="ExtendedQueryStatus" message="comm:Status"></output>
+			<fault
+				wsaw:Action="http://www.sifassociation.org/contract/DataModel/2.x/ExtendedQueryFault"
+				name="ExtendedQueryError" message="comm:TransportError">
+			</fault>
+		</operation>
+		
+		<operation name="QueryResults">
+			<input name="QueryResultsResponse" message="comm:QueryResults"></input>
+			<output name="QueryResultsStatus" message="comm:Status"></output>
+			<fault
+				wsaw:Action="http://www.sifassociation.org/contract/DataModel/2.x/QueryResultsFault"
+				name="QueryResultsError" message="comm:TransportError">
+			</fault>
+		</operation>
+		
+		<operation name="ExtendedQueryResults">
+			<input name="ExtendedQueryResultsResponse" message="comm:ExtendedQueryResults"></input>
+			<output name="ExtendedQueryResultsStatus" message="comm:Status"></output>
+			<fault
+				wsaw:Action="http://www.sifassociation.org/contract/DataModel/2.x/ExtendedQueryResultsFault"
+				name="ExtendedQueryResultsError" message="comm:TransportError">
+			</fault>
+		</operation>
+		
+
+		<operation name="CancelRequests">
+			<input name="CancelRequestsRequest" message="comm:CancelRequests"></input>
+			<output name="CancelRequestsStatus" message="comm:Status"></output>
+			<fault
+				wsaw:Action="http://www.sifassociation.org/contract/DataModel/2.x/CancelRequestsFault"
+				name="CancelRequestsError" message="comm:TransportError">
+			</fault>
+		</operation>
+
+		
+		<operation name="DataModelError">
+			<input name="ErrorNotify" message="comm:DataModelError"></input>
+			<output name="ErrorAccepted" message="comm:Status"></output>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/DataModel/2.x/ErrorRejectedFault"
+				name="ErrorRejectedFault" message="comm:TransportError">
+			</fault>
+		</operation>
+		
+	</portType>
+	
+	<!-- 
+		All operations will be anonymous (send back response on same HTTP channel). On some
+		platforms this doesn't inherit, and BP 1.2 requires this policy to be reasserted for
+		each operation.
+		
+		Because WS-Addressing is being used to define the actions, a SOAP Action does not
+		have to be defined for each operation. It may be removed from the binding below.
+		   
+		   For the "Query" operation, this takes the following form.
+		
+		      soapAction="http://www.sifassociation.org/contract/DataModel-S11/2.x/Query"
+	-->	
+	
+	<binding name = "DataModel-S11" type="tns:ptDataModel">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/> 
+	
+		<operation name="Event">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/DataModel-S11/2.x/Event" 
+				style="document"/>
+			<input name="PostEvent"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Event" part="hdr" use="literal"/>
+			</input>
+			<output name="EventStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="EventError">
+				<soap:fault name="EventError" use="literal"/>	
+			</fault>
+		</operation>
+		
+	<!--  Query operation binding has named input and output matching port Query operation binding.  Doesn't seem to change things -->
+		<operation name="Query">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/DataModel-S11/2.x/Query" 
+				style="document"/>
+			<input name="QueryRequest">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Query" part="hdr" use="literal"/>
+			</input>
+			<output name="QueryStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="QueryError">
+				<soap:fault name="QueryError" use="literal"/>
+			</fault>
+		</operation>
+		
+	
+		<operation name="ExtendedQuery">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/DataModel-S11/2.x/ExtendedQuery" 
+				style="document"/>
+			<input name="ExtendedQueryRequest"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:ExtendedQuery" part="hdr" use="literal"/>
+			</input>
+			<output name="ExtendedQueryStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="ExtendedQueryError">
+				<soap:fault name="ExtendedQueryError" use="literal"/>
+			</fault>
+		</operation>
+		
+		<operation name="QueryResults">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/DataModel-S11/2.x/QueryResults" 
+				style="document"/>
+			<input name="QueryResultsResponse"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:QueryResults" part="hdr" use="literal"/>
+			</input>
+			<output name="QueryResultsStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="QueryResultsError">
+				<soap:fault name="QueryResultsError" use="literal"/>
+			</fault>
+		</operation>
+		
+		<operation name="ExtendedQueryResults">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/DataModel-S11/2.x/ExtendedQueryResults" 
+				style="document"/>
+			<input name="ExtendedQueryResultsResponse"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:ExtendedQueryResults" part="hdr" use="literal"/>
+			</input>
+			<output name="ExtendedQueryResultsStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="ExtendedQueryResultsError">
+				<soap:fault name="ExtendedQueryResultsError" use="literal"/>
+			</fault>
+		</operation>
+		
+		<operation name="CancelRequests">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/DataModel-S11/2.x/CancelRequests" 
+				style="document"/>
+			<input name="CancelRequestsRequest"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:CancelRequests" part="hdr" use="literal"/>
+			</input>
+			<output name="CancelRequestsStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="CancelRequestsError">
+				<soap:fault name="CancelRequestsError" use="literal"/>
+			</fault>
+		</operation>
+		
+
+		<!-- Asynchronous Error - Sent instead of Response 
+			 This is a user level error and will not be mapped to a SOAP Fault
+		-->
+		<operation name="DataModelError">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/DataModel-S11/2.x/DataModelError" 
+				style="document"/>
+			<input name="ErrorNotify"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:DataModelError" part="hdr" use="literal"/>
+			</input>
+			<output name="ErrorAccepted">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="ErrorRejectedFault">
+				<soap:fault name="ErrorRejectedFault" use="literal"/>
+				
+			</fault>
+		</operation>
+	</binding>
+	
+	
+   <service name="SIFDataModel">
+   	<port name="DataModel" binding="tns:DataModel-S11">
+   		
+   		<!-- Anonymous URI - replace with deployed DataModel Service URL -->
+   		<soap:address location="http://www.w3.org/2005/08/addressing/anonymous"></soap:address>
+   		
+   	</port>
+   </service>
+		
+</definitions>

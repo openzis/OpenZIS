@@ -1,0 +1,208 @@
+<definitions 
+	name="Common"
+	targetNamespace="http://www.sifassociation.org/contract/Common/2.x"
+	xmlns="http://schemas.xmlsoap.org/wsdl/" 
+	
+	xmlns:tns="http://www.sifassociation.org/contract/Common/2.x" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	
+	xmlns:sift="http://www.sifassociation.org/transport/soap/2.x"
+	xmlns:sifm="http://www.sifassociation.org/message/soap/2.x"
+	
+	xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" 
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	>
+	
+	
+	<!-- Provision 
+		This is the "Common" WSDL which defines the set of messages that both the Zone 
+		and Agent WSDLS share. It is an abstract WSDL, that doesn't define the Port Types.
+		
+		Namespaces:
+			tns:  SIF Common WSDL Messages
+			sift: SIFHeader (SOAP Header Transport)
+			sifm: SIF Message Schemas tailored for SOAP transport
+	-->
+
+	
+	<types>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://www.sifassociation.org/contract/Common/2.x"
+			xmlns="http://www.sifassociation.org/contract/Common/2.x"
+			elementFormDefault="qualified">
+			<xs:import namespace="http://www.sifassociation.org/transport/soap/2.x" 
+				schemaLocation="Transport-1.xsd"></xs:import>
+			<xs:import namespace="http://www.sifassociation.org/message/soap/2.x" 
+				schemaLocation="Messaging-1.xsd"></xs:import>
+			<xs:import namespace="http://schemas.xmlsoap.org/soap/envelope/"
+				schemaLocation="http://schemas.xmlsoap.org/soap/envelope/"/>
+		</xs:schema>
+		<xs:documentation>
+			The messages definitions need only SIF Transport and Message Schemas.
+			Both of these will have to be imported into the Zone and PushAgent binding schemas.
+		</xs:documentation>
+	</types>
+	
+	<!--The SIF Header Message. Placeholder -->
+	<message name="Sifh">
+		<part name="header" element="sift:SIFHeader" />
+	</message>
+	
+	<!--The synchronous return to every message but the "Get" ones -->
+	<message name="Status">
+		<part name="bdy" element="sifm:Status"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	
+	<!-- Data Model And Zone Service Errors are valid messages
+		  issuable in place of a Response or Service Out
+		  
+	      DeQueue Error is a valid message return to a GetMessage
+		  response by a Pull Mode Agent
+	-->
+	<message name="DataModelError">
+		<part name="bdy" element="sifm:DataModelError"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	
+	<message name="ZoneServiceError">
+		<part name="bdy" element="sifm:DataModelError"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	
+	<message name="DeQueueError">
+		<part name="bdy" element="sifm:DataModelError"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	
+	<!-- The following is a placeholder, presumably replaced by the SOAP Fault error logic
+		in the WS Developer's toolkit	-->
+	<message name="TransportError">
+		<part name="bdy" element="sifm:DataModelError"/>
+		<!-- SOAP Fault logic replaces SIFHeader so the following is not needed
+		<part name="hdr" element="sift:SIFHeader"/>
+		-->
+	</message>
+	
+	
+	<!-- Provision -->
+	<message name="Register">
+		<part name="bdy" element="sifm:Register"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="Provide">
+		<part name="bdy" element="sifm:Provide"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="Subscribe">
+		<part name="bdy" element="sifm:Subscribe"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="Provision">
+		<part name="bdy" element="sifm:Provision"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	
+	<!-- UnProvision -->
+	<message name="Unsubscribe">
+		<part name="bdy" element="sifm:Unsubscribe"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="Unprovide">
+		<part name="bdy" element="sifm:Unprovide"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="Unregister">
+		<part name="bdy" element="sifm:Unregister"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	
+	<!--Events -->
+	<message name="Event">
+		<part name="bdy" element="sifm:Event"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	
+	<!-- Request / Response -->
+	<message name="Query">
+		<part name="bdy" element="sifm:Query"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="ExtendedQuery">
+		<part name="bdy" element="sifm:ExtendedQuery"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="QueryResults">
+		<part name="bdy" element="sifm:QueryResults"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="ExtendedQueryResults">
+		<part name="bdy" element="sifm:ExtendedQueryResults"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="CancelRequests">
+		<part name="bdy" element="sifm:CancelRequests"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	
+	<!--Synchronous Gets and Responses-->
+	<message name="GetZoneStatus">
+		<part name="bdy" element="sifm:GetZoneStatus"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="ZoneStatus">
+		<part name="bdy" element="sifm:ZoneStatusResponse"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="GetAgentACL">
+		<part name="bdy" element="sifm:GetAgentACL"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="AgentACL">
+		<part name="bdy" element="sifm:AgentACLResponse"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<!--Get Message returns a complete SOAP Envelope with Header and Body-->
+	<message name="GetMessage">
+		<part name="bdy" element="sifm:GetMessage"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="Message">
+		<part name="bdy" element="soap-env:Envelope"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	
+	<!--System Control-->
+	<message name="Ping">
+		<part name="bdy" element="sifm:Ping"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="Sleep">
+		<part name="bdy" element="sifm:Sleep"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="Wakeup">
+		<part name="bdy" element="sifm:Wakeup"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	
+	
+	<!--Zone Services-->
+	<message name="ServiceNotify">
+		<part name="bdy" element="sifm:ServiceNotify"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="ServiceInput">
+		<part name="bdy" element="sifm:ServiceInput"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="ServiceOutput">
+		<part name="bdy" element="sifm:ServiceOutput"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	<message name="CancelServiceInputs">
+		<part name="bdy" element="sifm:CancelServiceInputs"/>
+		<part name="hdr" element="sift:SIFHeader"/>
+	</message>
+	
+</definitions>

@@ -1,0 +1,99 @@
+<?php
+
+$frontendOptions = array( 'lifetime' => Null );
+
+$backendOptions = array( 'cache_dir' => CACHE );
+
+$cache = Zend_Cache::factory('Output',
+                             'File',
+                             $frontendOptions,
+                             $backendOptions);
+$cacheID='Zone1BuildNavigation'.$_SESSION['ADMIN_ID'];
+
+
+if (!($cache->start($cacheID))) {
+?>[
+		{
+			id: "zones_node",
+			"cls":"folder",
+			text: "Zones",
+			href:"javascript:zones.getAllZones();",
+			children: [
+<?php
+
+	$size = count($this->zones);
+	$counter = 1;
+	foreach($this->zones as $zone){
+		if(Agent::hasAgents($zone->zoneId)){
+			$agents = Agent::getAllAgentsInZone($zone->zoneId);
+			$size2 = count($agents);
+			$counter2 = 1;
+			
+			echo '{
+				id: '.$zone->zoneId.',
+				text: "'.$zone->sourceId.'",
+				"cls":"folder",
+				href:"javascript:zones.getZoneInformation('.$zone->zoneId.')",
+				children: [';
+/*				
+					echo '{
+							id: "'.$zone->zoneId.'_0",
+							text: "Messages",
+							leaf: true,
+							"cls":"file",
+							href:"javascript:zones.getZoneMessages('.$zone->zoneId.')"
+						  },';
+*/				
+				foreach($agents as $agent){
+					if($counter2 == $size2){
+					echo '{
+							id: "'.$zone->zoneId.'_'.$agent->agentId.'",
+							text: "'.$agent->agentDesc.'",
+							leaf: true,
+							"cls":"file",
+							href:"javascript:agent.getAgentDetails('.$zone->zoneId.', '.$agent->agentId.')"
+						  }';
+					}
+					else{
+						
+						echo '{
+							id: "'.$zone->zoneId.'_'.$agent->agentId.'",
+							text: "'.$agent->agentDesc.'",
+							leaf: true,
+							"cls":"file",
+							href:"javascript:agent.getAgentDetails('.$zone->zoneId.', '.$agent->agentId.')"
+						  },';
+						
+					}
+					$counter2++;
+				}	
+			if($counter == $size){
+				 echo "]}";
+			}
+			else{
+				echo "]},";
+			}
+		}
+		else{
+				echo '{
+						id: '.$zone->zoneId.',
+						text: "'.$zone->sourceId.'",
+						leaf: true,
+						"cls":"file",
+						href:"javascript:zones.getZoneInformation('.$zone->zoneId.')"';
+				
+				if($counter == $size){
+				 echo "}";
+				}
+				else{
+				 echo "},";
+				}
+		}
+		$counter++;
+	}
+
+?>	
+]
+}]<?php
+$cache->end();
+}

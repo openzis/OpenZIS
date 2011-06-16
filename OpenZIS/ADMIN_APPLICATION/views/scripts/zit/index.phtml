@@ -1,0 +1,9 @@
+{"success":true,
+<?php
+
+$zit = $this->zit;
+$errorMessages = $this->errorMessages;
+echo '"zit":['.Zend_Json::encode($zit).'],';
+echo '"errorMessages":'.Zend_Json::encode($errorMessages);
+echo '}';
+

@@ -1,0 +1,35 @@
+/*{"success":true,
+<?php
+
+$agents = $this->agents;
+
+echo '"agents":[';
+$size = count($agents);
+$counter = 1;
+foreach($agents as $agent){
+	echo '{';
+	echo '
+		  "agentId":"'.$agent->agentId.'",
+		  "agentDesc":"'.$agent->agentDesc.'",
+		  "sourceId":"'.$agent->sourceId.'",
+		  "password":"'.$agent->password.'",
+		  "username":"'.$agent->username.'",
+		  "status":"'.$agent->status.'",
+		  "ipaddress":"'.$agent->ipaddress.'",
+		  "maxbuffersize":"'.$agent->maxbuffersize.'",
+		  "certCommonDn":"'.$agent->certCommonDn.'",
+		  "numMessages":"'.$agent->numReceivedMessages.'",
+		  "active":"'.$agent->active.'",
+		  "createdUsername":"'.$agent->createdUsername.'"
+		  ';
+	if($counter == $size){
+		echo '}';
+	}
+	else{
+		echo '},';
+	}
+	$counter++;
+}
+
+echo ']}';
+echo '*/';

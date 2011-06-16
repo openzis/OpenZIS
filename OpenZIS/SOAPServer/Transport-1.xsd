@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.sifassociation.org/transport/soap/2.x"
+    xmlns="http://www.sifassociation.org/transport/soap/2.x"
+    elementFormDefault="qualified"> 
+    
+    <xs:annotation>
+        <xs:documentation>
+            SIFHeader element XSD.  Defines the SIF-specific elements contained in the SOAP Header
+            that direct the recipient as to what the message is, and how the contents of the 
+            SOAP Body must be processed.
+            
+            This is a stand-alone Schema specific to the SOAP Transport.  Where it duplicates complex
+            elements like SIF_Security and SIF_Context, it removes the "SIF_" prefixes, but otherwise
+            replicates them exactly.
+            
+            It declares one element.  It is meant for inclusion in the types section of a WSDL
+        </xs:documentation>
+    </xs:annotation>
+    
+   
+    
+    <xs:simpleType name="MsgIdType">
+        <xs:restriction base="xs:token">
+            <xs:pattern value="[0-9A-F]{32}"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="YesNoType">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="Yes"/>
+            <xs:enumeration value="No"/>   
+        </xs:restriction>
+    </xs:simpleType>
+   
+    
+    <xs:simpleType name="TopicNameType">
+        <xs:restriction>
+            <xs:simpleType>
+                <xs:restriction base="xs:NCName">
+                    <xs:maxLength value="64"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="ResponseVersionType">
+        <xs:restriction base="xs:token">
+            <xs:maxLength value="12"/>
+            <xs:pattern value="\*|([0-9]+[.]\*)|([0-9]+[.][0-9]+r\*)|([0-9]+[.][0-9]+(r[0-9]+)?)"/>
+        </xs:restriction>
+        
+    </xs:simpleType>
+    <xs:simpleType name="HeaderVersionType">
+        <xs:restriction base="xs:token">
+            <xs:maxLength value="12"/>
+            <xs:pattern value="[0-9].[0-9](r.[0-9])?"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="ZoneIdType">
+        <xs:restriction base="xs:token">
+            <xs:pattern value="(urn:sif:zone:[0-9A-Za-z./:]*)"/>
+        </xs:restriction>
+    </xs:simpleType>
+        
+    <xs:annotation>
+        <xs:documentation>Security Types</xs:documentation>
+    </xs:annotation>
+    
+    <xs:simpleType name="AuthenticationLevelType">
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="0"></xs:minInclusive>
+            <xs:maxInclusive value="3"></xs:maxInclusive>
+        </xs:restriction>  
+    </xs:simpleType>
+    
+    <xs:simpleType name="EncryptionLevelType">
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="0"></xs:minInclusive>
+            <xs:maxInclusive value="4"></xs:maxInclusive>
+        </xs:restriction>  
+    </xs:simpleType>
+    
+    <xs:complexType name="SecureChannelType">
+        <xs:sequence>
+            <xs:element name="AuthenticationLevel" type="AuthenticationLevelType"></xs:element>
+            <xs:element name="EncryptionLevel" type="EncryptionLevelType"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="SecurityType">
+        <xs:sequence>
+            <xs:element name="SecureChannel" type="SecureChannelType"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+   
+    <xs:annotation>
+        <xs:documentation>ID Types</xs:documentation>
+    </xs:annotation>
+    
+    <xs:simpleType name="SourceIdType">
+         <xs:restriction base="xs:token">
+             <xs:maxLength value="64"/>
+         </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="DestinationIdType">
+        <xs:restriction base="xs:token">
+            <xs:maxLength value="64"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:annotation>
+        <xs:documentation>Contexts</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType name="ContextType">
+        <xs:restriction base="xs:token">
+            <xs:maxLength value="64"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:complexType name="ContextsType">
+        <xs:sequence>
+            <xs:element name="Context" type="ContextType" maxOccurs="unbounded"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:annotation>
+        <xs:documentation>Packetization</xs:documentation>
+    </xs:annotation>
+    <xs:complexType name="PacketDataType">
+        <xs:sequence>
+            <xs:element name="PacketNumber" type="xs:positiveInteger"></xs:element>
+            <xs:element name="MorePackets" type="YesNoType"></xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- Zone Service Header-->
+    <xs:complexType name="ZoneServiceDataType">
+        <xs:sequence>
+            <!--NOT restricted to defined Zone Service Operations-->
+            <xs:element name="Operation" type="xs:NCName" minOccurs="0"></xs:element>
+            <xs:element name="ServiceMsgId" type="MsgIdType"></xs:element>
+            <!--MaxBufferSize stored in SIFHeader element-->
+            <!--Version stored in SIFHeader element-->
+            <!--Service stored in "TopicName" (combined with Object Name). Both are non qualified tokens and not enumerated lists -->
+        </xs:sequence>
+    </xs:complexType>
+            
+    <xs:complexType name="SIFHeaderType">
+        <xs:sequence>
+            <!--Message Independent Header Information-->
+            <xs:element name="Timestamp" type="xs:dateTime"></xs:element>
+            <xs:element name="ZoneId" type="ZoneIdType" ></xs:element>
+            <xs:element name="InfrastructureVersion" type="HeaderVersionType"></xs:element>
+            <xs:element name="DataModel" type="xs:anyURI" minOccurs="0"></xs:element>
+            <xs:element name="DataModelVersion" type="HeaderVersionType" minOccurs="0"></xs:element>
+           
+            <xs:element name="Security" type="SecurityType" minOccurs="0"></xs:element>
+            <xs:element name="SourceId" type="SourceIdType"></xs:element>
+            <xs:element name= "DestinationId" type="DestinationIdType" minOccurs="0"></xs:element>
+            <xs:element name="PacketData" type="PacketDataType" minOccurs="0"></xs:element>
+            <xs:element name="Contexts" type="ContextsType" minOccurs="0"></xs:element>
+            
+            <!--Message Header information supplied by WS-Addressing equivalent elements in the SOAP Header
+            wsa:MessageId   - <xs:element name="MsgId" type="MsgIdType"></xs:element>
+            wsa:Action      - <xs:element name="MsgName" type="WSDLMessageNameType"></xs:element>
+            wsa:RelatesTo     - <xs:element name="OriginalMsgId" type="MsgIdType" minOccurs="0"></xs:element>  // In Status
+            wsa:RelatesTo     - <xs:element name="RequestMsgId" type="MsgIdType" minOccurs="0"></xs:element>  // In Response
+            wsa:RelatesTo     - <xs:element name="ServiceMsgId" type="MsgIdType" minOccurs="0"></xs:element> // In ServiceOutput
+            -->
+            
+            <!--Conditional Per Message Type Header Information-->
+            <xs:element name="OriginalSourceId" type="SourceIdType" minOccurs="0"></xs:element>
+            <xs:element name="TopicName" type="TopicNameType" minOccurs="0"></xs:element>
+            <xs:element name="EventAction" minOccurs="0" >
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="Add"/>
+                        <xs:enumeration value="Delete"/>
+                        <xs:enumeration value="Change"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="MaxBufferSize" type="xs:unsignedInt" minOccurs="0"></xs:element>
+            <xs:element name="ResponseVersion" type="ResponseVersionType" minOccurs="0" maxOccurs="unbounded" ></xs:element>
+            
+            <!--Zone Service Elements-->
+            <xs:element name="ZoneServiceData" type="ZoneServiceDataType" minOccurs="0"></xs:element>
+           
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:annotation>
+        <xs:documentation>SIFHeader element declaration for WSDL file </xs:documentation>
+    </xs:annotation>
+    
+    <!--xs:element name="SIF_Header" type ="SIF_HeaderType"/> -->
+    <xs:element name="SIFHeader" type ="SIFHeaderType"></xs:element>
+    
+    <!-- General Comments
+        
+        Decoupling of SIF Messages from the SOAP transport means not even the
+        Message Type names can be contained in an enumerated list:
+        
+     <xs:simpleType name="WSDLMessageNameType">
+        <xs:restriction base="xs:token">
+        <xs:enumeration value="Status"/>
+        <xs:enumeration value="DataModelError"/>
+        <xs:enumeration value="ZoneServiceError"/>
+        <xs:enumeration value="Register"/>
+        <xs:enumeration value="Provide"/>
+        <xs:enumeration value="Subscribe"/>
+        <xs:enumeration value="Provision"/>
+        <xs:enumeration value="Unsubscribe"/>
+        <xs:enumeration value="Unprovide"/>
+        <xs:enumeration value="Unregister"/>
+        <xs:enumeration value="Event"/>
+        <xs:enumeration value="Query"/>
+        <xs:enumeration value="ExtendedQuery"/>
+        <xs:enumeration value="QueryResults"/>
+        <xs:enumeration value="ExtendedQueryResults"/>
+        <xs:enumeration value="CancelRequests"/>
+        <xs:enumeration value="GetZoneStatus"/>
+        <xs:enumeration value="ZoneStatus"/>
+        <xs:enumeration value="GetAgentACL"/>
+        <xs:enumeration value="AgentACL"/>
+        <xs:enumeration value="GetMessage"/>
+        <xs:enumeration value="Message"/>
+        <xs:enumeration value="Ping"/>
+        <xs:enumeration value="Sleep"/> 
+        <xs:enumeration value="Wakeup"/>
+        <xs:enumeration value="ServiceInput"/>
+        <xs:enumeration value="ServiceOutput"/>   
+        <xs:enumeration value="ServiceNotify"/>  
+        <xs:enumeration value="CancelServiceInputs"/>
+        </xs:restriction>
+     </xs:simpleType>
+        
+        Return description not needed since successful GET returns don't have descriptions
+        <xs:simpleType name="GetReturnDescriptionType">
+        <xs:restriction base="xs:string">
+        <xs:maxLength value="1024" fixed="true"></xs:maxLength>
+        </xs:restriction>
+        </xs:simpleType>
+        
+        Return code not needed since either Message is present in the SOAP Body (0) or it isn't (9)
+        <xs:simpleType name="GetReturnCodeType">
+        <xs:restriction base="xs:int">
+        <xs:minInclusive value="0"></xs:minInclusive>
+        <xs:maxInclusive value="9"></xs:maxInclusive>
+        </xs:restriction>  
+        </xs:simpleType>
+        
+        <xs:element name="GetReturnCode" type="GetReturnCodeType" minOccurs="0"></xs:element>
+        <xs:element name="GetReturnDescription" type="GetReturnDescriptionType" minOccurs="0"></xs:element>
+        
+        Extensible elements for SIFHeader:  Removed
+        <xs:complexType name="ExtendedContentType">
+          <xs:complexContent mixed="true" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:restriction base="xs:anyType">
+                <xs:sequence>
+                    <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:restriction>
+          </xs:complexContent>
+       </xs:complexType>
+    
+      <xs:element name="ExtendedHeaderContent" type="ExtendedContentType" minOccurs="0"></xs:element>
+    -->
+    
+</xs:schema>

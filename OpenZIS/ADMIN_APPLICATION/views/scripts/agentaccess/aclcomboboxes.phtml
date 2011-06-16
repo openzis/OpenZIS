@@ -1,0 +1,41 @@
+<table>
+<tr>
+<td>
+	    <font style="font-size:18px;">Zones</font>
+		<br/>
+		<select id="zonesCMB" onchange="access.selectZone(this);" style="width:200px;"><option value="0">Select Zone</option>
+			<?
+				foreach($this->zones as $zone){
+							echo '<option value="'.$zone->zoneId.'">'.$zone->zoneDesc.'</option>';
+						}
+			?>	
+		</select>
+</td>
+</tr>
+<tr>
+<td>
+		<font style="font-size:18px;">Contexts</font>
+		<br/>
+		<select disabled id="contextsCMB" style="width:200px;" onchange="access.selectContext(this);"><option value="0">Select Context</option>
+			<?
+				foreach($this->contexts as $context){
+							echo '<option value="'.$context->contextId.'">'.$context->contextDesc.'</option>';
+						}
+			?>	
+		</select>
+</td>
+</tr>
+<tr>
+<td>
+		<font style="font-size:18px;">Agents</font>
+		<br/>
+		<select disabled id="agentsCMB" style="width:200px;" onchange="access.selectAgent(this);"><option value="0">Select Agent</option>
+			<?
+				foreach($this->agents as $agent){
+							echo '<option value="'.$agent->agentId.'">'.$agent->agentDesc.'</option>';
+						}
+			?>	
+		</select>
+</td>
+</tr>
+</table>

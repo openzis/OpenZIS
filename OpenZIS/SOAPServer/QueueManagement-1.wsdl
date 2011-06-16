@@ -1,0 +1,213 @@
+<!-- 
+	QueueManagement WSDL
+	
+	The QueueManagement Service interface is supported only by the ZIS (mandatory).  
+	
+	There is a single Port Type, and it is bound to SOAP 1.1. The Service has its URL address 
+	set to the anonymous URI. The developer need only set this address to the actual URL that the 
+	service will be deployed at and this WSDL file will be complete.  It is recommended that this
+	URL be identical to that of all other SIF Web Service interfaces supported by the ZIS
+	implementation it encapsulates.
+	
+	Only the GetMessage and the Status and Error operations are provided.  This service is used 
+	exclusively by Pull Mode SIF Web Agents. It allows them to function solely as web clients, 
+	by supporting an operation which “gets the next message to be delivered”.  
+	
+	This operation SHOULD be invoked synchronously by these clients only when they are ready to receive 
+	a new message, and it eliminates the need for them to provide a call back URL at Registration time, 
+	or to support any SIF-provided WSDL.
+	
+	There is a message exchange choreography required between the client and ZIS which is unique to this 
+	web service.
+	•	A SOAP Pull Mode Agent invokes the GetMessage operation of the QueueManagement Web Service
+	•	It synchronously (on the same HTTP/S connection) receives a SOAP message in which the SOAP Body 
+	contains the entire SOAP Envelope of the returned message.
+	•	The Agent then invokes the Status or Error operation of the QueueManagement Web Service, letting it know 
+	whether it can release the previously sent message from the delivery queue for this Pull Mode Agent. 
+	
+	The final part of that exchange represents the only time that a SIF Status message is issued 
+	asynchronously, rather than being a synchronous response to an operation invocation.
+	
+	
+	Namespaces:
+	tns:  QueueManagement WSDL
+	comm: SIF Common WSDL Messages
+	sift: Transport XSD  (SIFHeader)
+	sifm: Messaging XSD (independent of Data Model)
+	
+-->
+
+
+<definitions
+	name="QueueManagement"
+	targetNamespace="http://www.sifassociation.org/contract/QueueManagement/2.x"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:tns="http://www.sifassociation.org/contract/QueueManagement/2.x"
+	
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	
+	xmlns:comm="http://www.sifassociation.org/contract/Common/2.x" 
+	xmlns:sift="http://www.sifassociation.org/transport/soap/2.x"
+	xmlns:sifm="http://www.sifassociation.org/message/soap/2.x"
+	xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"
+	
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+	
+	>
+
+	<documentation>Version 2.5</documentation>
+	
+	<!-- Import Common WSDL with messages -->
+	
+	<import namespace="http://www.sifassociation.org/contract/Common/2.x" 
+		location="Common-7.wsdl"/>
+
+	<types>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://www.sifassociation.org/contract/QueueManagement/2.x"
+			xmlns="http://www.sifassociation.org/contract/QueueManagement/2.x"
+			elementFormDefault="qualified">
+			<xs:import namespace="http://www.sifassociation.org/transport/soap/2.x"
+				schemaLocation="Transport-1.xsd"></xs:import>
+			<xs:import namespace="http://www.sifassociation.org/message/soap/2.x"
+				schemaLocation="Messaging-1.xsd"></xs:import>
+			
+			<!-- The following imports may have to be done to satisfy tools which don't have these standard namespaces prestored:
+					soap-env, wsaw 
+				Other standard namespaces above (wsp, wsam, wsa, soap) may have to have imported contents as well 
+			<xs:import namespace="http://schemas.xmlsoap.org/soap/envelope/"
+				schemaLocation="http://schemas.xmlsoap.org/soap/envelope/"></xs:import>
+			<xs:import namespace="http://www.w3.org/2006/05/addressing/wsdl"
+				schemaLocation="http://www.w3.org/2007/02/addressing/metadata/ws-addr-metadata.xsd"></xs:import> 
+			-->				
+		</xs:schema>
+
+		<xs:annotation>
+			<xs:documentation>
+				The following operations are supported by the QueueManagement ZIS Port
+				
+				GetMessage (Request a Message)
+				GetMessageStatus (Valid Message Received in response to GetMessage)
+				GetMessageError (Problems with Message Received in response to GetMessage)
+				
+				Both the Status and the Error are one-way messages (unique to the SIF Message Types)
+			</xs:documentation>
+		</xs:annotation>
+
+	</types>
+
+	<portType name="ptQueueManagement">
+
+		<operation name="GetMessageReturnStatus">
+			<input name="GetMessageStatusResponse" message="comm:Status"/>
+			<!-- 		<output name="StatusStatus" message="comm:Status"/> Not used (one way message!) 
+				<fault wsaw:Action="http://www.sifassociation.org/contract/QueueManagement/2.x/StatusFault" 
+				name="StatusError" message="comm:TransportError"> </fault> -->
+		</operation>
+
+		<operation name="GetMessageReturnError">
+			<input name="GetMessageStatusError" message="comm:DeQueueError"/>
+			<!-- 		<output name="ErrorStatus" message="comm:Status"/> Not used (one way message!) 
+				<fault wsaw:Action="http://www.sifassociation.org/contract/QueueManagement/2.x/StatusFault" 
+				name="StatusError" message="comm:TransportError"> </fault> -->
+		</operation>
+		
+		<operation name="GetMessage">
+			<input name="GetMessage" message="comm:GetMessage"/>
+			<output name="Message" message="comm:Message"/>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/QueueManagement/2.x/MessageFault"
+				name="MessageError" message="comm:TransportError"> </fault>
+		</operation>
+
+	</portType>
+
+	<!-- 
+
+		All operations will be anonymous (send back response on same HTTP channel). On some
+		platforms this doesn't inherit, and BP 1.2 requires this policy to be reasserted for
+		each operation.
+		
+		Because WS-Addressing is being used to define the actions, a SOAP Action does not
+		have to be defined for each operation. It may be removed from the binding below.
+		   
+		   For the "GetMessage" operation, this takes the following form.
+		
+		      soapAction="http://www.sifassociation.org/contract/QueueManagement-S11/2.x/GetMessage"
+		**>
+	-->
+
+	<binding name="QueueManagement-S11" type="tns:ptQueueManagement">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+		<operation name="GetMessageReturnStatus">
+			<soap:operation
+				soapAction=
+				"http://www.sifassociation.org/contract/QueueManagement-S11/2.x/GetMessageReturnStatus"
+				style="document"/>
+			<input name="GetMessageStatusResponse">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</input>
+			<!-- Not used (one way message!)
+				<output name="StatusStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+				</output>
+			
+			<fault name="StatusError">
+				<soap:fault name="StatusError" use="literal"/>
+				</fault> -->
+		</operation>
+
+		<operation name="GetMessageReturnError">
+			<soap:operation
+				soapAction=
+				"http://www.sifassociation.org/contract/QueueManagement-S11/2.x/GetMessageReturnError"
+				style="document"/>
+			<input name="GetMessageStatusError">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:DeQueueError" part="hdr" use="literal"/>
+			</input>
+			<!-- Not used (one way message!)
+				<output name="ErrorStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+				</output>
+				
+				<fault name="ErrorError">
+				<soap:fault name="ErrorError" use="literal"/>
+				</fault> -->
+		</operation>
+
+		<operation name="GetMessage">
+			<soap:operation
+				soapAction="http://www.sifassociation.org/contract/QueueManagement-S11/2.x/GetMessage"
+				style="document"/>
+			<input name="GetMessage">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:GetMessage" part="hdr" use="literal"/>
+			</input>
+			<output name="Message">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Message" part="hdr" use="literal"/>
+			</output>
+			<fault name="MessageError">
+				<soap:fault name="MessageError" use="literal"/>
+			</fault>
+		</operation>
+	</binding>
+
+
+	<service name="QueueManagement">
+		<port name="SifQueueManagement" binding="tns:QueueManagement-S11">
+
+			<!-- Anonymous URI - replace with deployed Queuemanagement URL -->
+			<soap:address location="http://www.w3.org/2005/08/addressing/anonymous"/>
+
+		</port>
+	</service>
+
+</definitions>

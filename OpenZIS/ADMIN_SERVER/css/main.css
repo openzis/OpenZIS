@@ -1,0 +1,46 @@
+@charset "utf-8";
+/* CSS Document */
+.blist 
+{
+    background-image: url(../images/list-items.gif) !important;
+}
+
+.logout
+{
+    background-image: url(../images/logout.gif) !important;
+}
+
+body
+{
+	background-color:#E2E2E2;
+	font-family:Geneva, Arial, Helvetica, sans-serif;
+}
+
+.loginDiv
+{
+	border:5px solid #666666;
+	padding: 2px 2px 2px 2px;
+	width:300px;
+	background-color:#FFFFFF;
+}
+
+input.button
+{
+	background:#F3F3F3 none repeat scroll 0%;
+	border-color:#CCCCCC rgb(153, 153, 153) rgb(153, 153, 153) rgb(204, 204, 204);
+	border-style:solid;
+	border-width:1px;
+	color:#666666;
+	font-family:Verdana,Helvetica,sans-serif;
+	font-size:10px;
+	font-size-adjust:none;
+	font-stretch:normal;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:bold;
+	height:24px;
+	line-height:10px;
+	margin:0px;
+	padding:3px 5px;
+	cursor:pointer;
+}

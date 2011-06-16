@@ -1,0 +1,281 @@
+<!-- 
+	ZoneService WSDL
+	
+	The ZoneService Service interface is supported by both the ZIS (mandatory) 
+	and PushMode Agents (optional).  
+	
+	There is a single Port Type, and it is bound to SOAP 1.1. The Service has its URL address 
+	set to the anonymous URI.The developer need only set this address to the actual URL that the 
+	service will be deployed at and this WSDL file will be complete.  It is recommended that this
+	URL be identical to that of all other SIF Web Service interfaces supported by the implementation 
+	(ZIS or PUSH Mode Agent) it encapsulates.
+	
+	The operations of this Web Service map directly to the three message types comprising the 
+	infrastructure expansion made in support of Zone Services (ServiceInput, ServiceOutput,
+	ServiceNotify). These standardize the interface to all SIF Zone Services in the same 
+	way the interface to all Object Providers conforms to the DataModel WSDL. 
+	
+	Any SIF Zone Service (of whatever variety) is only accessible through operations defined
+	in this Web Service.  Any “operation” (and associated arguments) specific to an individual Zone 
+	Service are embedded in the SOAP Body.  Specifically the WS-Addressing “Action” value will be 
+	either ServiceInput, ServiceOutput or ServiceNotify.
+	
+	Namespaces:
+	tns:  ZoneService WSDL
+	comm: SIF Common WSDL Messages
+	sift: Transport XSD  (SIFHeader)
+	sifm: Messaging XSD (independent of Data Model)
+	
+-->
+
+<definitions
+	name="ZoneService"
+	targetNamespace="http://www.sifassociation.org/contract/ZoneService/2.x"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:tns="http://www.sifassociation.org/contract/ZoneService/2.x"
+	
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+		
+	xmlns:comm="http://www.sifassociation.org/contract/Common/2.x" 
+	xmlns:sift="http://www.sifassociation.org/transport/soap/2.x"
+	xmlns:sifm="http://www.sifassociation.org/message/soap/2.x"
+	xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"
+		
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+	>
+	
+	<documentation>Version 2.5</documentation>
+	
+	<!-- Import Common WSDL with messages -->
+	<import namespace="http://www.sifassociation.org/contract/Common/2.x"
+		location="Common-7.wsdl"></import>
+	
+	<types>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://www.sifassociation.org/contract/ZoneService/2.x"
+			xmlns="http://www.sifassociation.org/contract/ZoneService/2.x"
+			elementFormDefault="qualified">
+			<xs:import namespace="http://www.sifassociation.org/transport/soap/2.x" 
+				schemaLocation="Transport-1.xsd"></xs:import>
+			<xs:import namespace="http://www.sifassociation.org/message/soap/2.x" 
+				schemaLocation="Messaging-1.xsd"></xs:import>
+			
+			<!-- The following imports may have to be done to satisfy tools which don't have these standard namespaces prestored:
+				soap-env, wsaw 
+				Other standard namespaces above (wsp, wsam, wsa, soap) may have to have imported contents as well 
+				<xs:import namespace="http://schemas.xmlsoap.org/soap/envelope/"
+				schemaLocation="http://schemas.xmlsoap.org/soap/envelope/"></xs:import>
+				<xs:import namespace="http://www.w3.org/2006/05/addressing/wsdl"
+				schemaLocation="http://www.w3.org/2007/02/addressing/metadata/ws-addr-metadata.xsd"></xs:import> 
+			-->			
+			
+		</xs:schema>
+		
+		
+		<xs:documentation>
+			The messages definitions need SIF Transport and Message Schemas.
+			Both of these are imported into the ZoneService Port Type and Binding.
+		</xs:documentation>
+		
+		<xs:annotation>
+			<xs:documentation>
+			The following operations are supported by the ZoneService Port
+			
+			   CancelServiceInputs
+			   
+			   ServiceInput
+			   ServiceOutput
+			   ServiceNotify
+			   
+			   ZoneServiceError (when receiving a rejection of a ServiceIn instead of
+			   the expected ServiceOut).  A SOAP Fault is a TransportError
+			   
+			</xs:documentation>
+		</xs:annotation>
+		
+	</types>
+
+	<portType name="ptZoneService">
+
+		<operation name="CancelServiceInputs">
+			<input name="CancelServiceInputsRequest" message="comm:CancelServiceInputs"></input>
+			<output name="CancelServiceInputsStatus" message="comm:Status"></output>
+			<fault 
+				wsaw:Action="http://www.sifassociation.org/contract/ZoneService/2.x/CancelServiceInputsFault"
+				name="CancelServiceInputsError" message="comm:TransportError">
+			</fault>
+		</operation>
+
+		<operation name="ServiceInput">
+			<input name="ServiceInputRequest" message="comm:ServiceInput"></input>
+			<output name="ServiceInputStatus" message="comm:Status"></output>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/ZoneService/2.x/ServiceInputFault"
+				name="ServiceInputError" message="comm:TransportError">
+			</fault>
+		</operation>
+
+		<operation name="ServiceOutput">
+			<input name="ServiceOutputResponse" message="comm:ServiceOutput"></input>
+			<output name="ServiceOutputStatus" message="comm:Status"></output>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/ZoneService/2.x/ServiceOutputFault"
+				name="ServiceOutputError" message="comm:TransportError">
+			</fault>
+		</operation>
+
+		<operation name="ServiceNotify">
+			<input name="PostServiceNotify" message="comm:ServiceNotify"></input>
+			<output name="ServiceNotifyStatus" message="comm:Status"></output>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/ZoneService/2.x/ServiceNotifyFault"
+				name="ServiceNotifyError" message="comm:TransportError">
+			</fault>
+		</operation>
+		
+		<operation name="ZoneServiceError">
+			<input name="ErrorNotify" message="comm:ZoneServiceError"></input>
+			<output name="ErrorAccepted" message="comm:Status"></output>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/ZoneService/2.x/ErrorRejectedFault"
+				name="ErrorRejectedFault" message="comm:TransportError">
+			</fault>
+		</operation>
+		
+	</portType>
+	
+	<!-- 
+		Basically we are enforcing WS-Addressing in the binding to this port type.
+		The wsa:Actions will be generated automatically according to the default algorithm
+		(targetnamespace/portname/operation name)
+		
+		Per Port
+			<wsp:Policy>
+				<wsam:Addressing>
+					<wsp:Policy><wsam:AnonymousResponses/></wsp:Policy>/>
+				</wsam:Addressing>
+			</wsp:Policy>
+			
+		Per Operation
+			<wsp:Policy>
+				<wsam:Addressing>
+					<wsp:Policy><wsam:AnonymousResponses/></wsp:Policy>/>
+				</wsam:Addressing>
+			</wsp:Policy>
+		
+		All operations will be anonymous (send back response on same HTTP channel). On some
+		platforms this doesn't inherit, and BP 1.2 requires this policy to be reasserted for
+		each operation.
+		
+		Because WS-Addressing is being used to define the actions, a SOAP Action does not
+		have to be defined for each operation. It may be removed from the binding below.
+		   
+		   For the "ServiceInput" operation, this takes the following form.
+		
+		      soapAction="http://www.sifassociation.org/contract/ZoneService-S11/2.x/ServiceInput"
+	-->	
+	
+	<binding name = "ZoneService-S11" type="tns:ptZoneService">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/> 
+		
+		<operation name="CancelServiceInputs">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/ZoneService-S11/2.x/CancelServiceInputs" 
+				style="document"/>
+			<input name="CancelServiceInputsRequest"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:CancelServiceInputs" part="hdr" use="literal"/>
+			</input>
+			<output name="CancelServiceInputsStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="CancelServiceInputsError">
+				<soap:fault name="CancelServiceInputsError" use="literal"/>
+			</fault>
+		</operation>
+		
+		<operation name="ServiceInput">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/ZoneService-S11/2.x/ServiceInput" 
+				style="document"/>
+			<input name="ServiceInputRequest"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:ServiceInput" part="hdr" use="literal"/>
+			</input>
+			<output name="ServiceInputStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="ServiceInputError">
+				<soap:fault name="ServiceInputError" use="literal"/>
+			</fault>
+		</operation>
+		
+		<operation name="ServiceOutput">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/ZoneService-S11/2.x/ServiceOutput" 
+				style="document"/>
+			<input name="ServiceOutputResponse"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:ServiceOutput" part="hdr" use="literal"/>
+			</input>
+			<output name="ServiceOutputStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="ServiceOutputError">
+				<soap:fault name="ServiceOutputError" use="literal"/>
+			</fault>
+		</operation>
+		
+		<operation name="ServiceNotify">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/ZoneService-S11/2.x/ServiceNotify" 
+				style="document"/>
+			<input name="PostServiceNotify"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:ServiceNotify" part="hdr" use="literal"/>
+			</input>
+			<output name="ServiceNotifyStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="ServiceNotifyError">
+				<soap:fault name="ServiceNotifyError" use="literal"/>
+				
+			</fault>
+		</operation>
+		
+		<!-- Asynchronous Error - Sent instead of ServiceOut
+			 This is a user level error and will not be mapped to a SOAP Fault
+		-->
+		<operation name="ZoneServiceError">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/ZoneService-S11/2.x/ZoneServiceError" 
+				style="document"/>
+			<input name="ErrorNotify"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:DataModelError" part="hdr" use="literal"/>
+			</input>
+			<output name="ErrorAccepted">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="ErrorRejectedFault">
+				<soap:fault name="ErrorRejectedFault" use="literal"/>
+				
+			</fault>
+		</operation>
+	</binding>
+	
+	
+   <service name="SIFZoneService">
+   	<port name="ZoneService" binding="tns:ZoneService-S11">
+   		
+   		<!-- Anonymous URI - replace with deployed ZoneService Service URL -->
+   		<soap:address location="http://www.w3.org/2005/08/addressing/anonymous"></soap:address>
+   		
+   	</port>
+   </service>
+		
+</definitions>

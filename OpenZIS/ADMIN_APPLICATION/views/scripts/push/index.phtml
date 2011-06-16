@@ -1,0 +1,7 @@
+{"success":true
+<?php
+
+if($this->admins != null){
+	echo ',"admins":'.Zend_Json::encode($this->admins);
+}
+echo '}';

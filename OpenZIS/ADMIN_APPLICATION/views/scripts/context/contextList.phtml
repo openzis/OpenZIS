@@ -1,0 +1,16 @@
+<table class="contextList">
+<?php
+$counter = 0;
+foreach($this->contexts as $context){
+	if(($counter % 2) == 0){
+		echo '<tr class="contextListEven" onclick="context.showEditContext(\''.$context->contextDesc.'\', '.$context->contextId.');"><td>'.$context->contextDesc.'</td></tr>';
+	}
+	else{
+		echo '<tr class="contextListOdd" onclick="context.showEditContext(\''.$context->contextDesc.'\', '.$context->contextId.');"><td>'.$context->contextDesc.'</td></tr>';
+	}
+	$counter++;
+}
+
+?>
+<tr><td><input type="button" class="button" value="Add +" onclick="context.showAddContext();"/></td></tr>
+</table>

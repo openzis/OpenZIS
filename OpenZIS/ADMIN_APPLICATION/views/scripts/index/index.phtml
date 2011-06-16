@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">  
+<html xmlns="http://www.w3.org/1999/xhtml">  
+  <head>  
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
+    <title>OpenZIS your Open Source Zone Integration Server</title>  
+	<link href="./css/ext-all.css" media="screen" rel="stylesheet" type="text/css" />
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
+	<link href="./css/main.css" media="screen" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="./js_debug/ext-base.js" ></script>
+	<script type="text/javascript" src="./js_debug/ext-all.js" ></script>
+	<script type="text/javascript" src="./js_debug/mainExt.js" ></script>
+	<script type="text/javascript" src="./js_debug/grids.js" ></script>
+	<script type="text/javascript" src="./js_debug/zone.js" ></script>
+	<script type="text/javascript" src="./js_debug/context.js" ></script>
+	<script type="text/javascript" src="./js_debug/agent.js" ></script>
+	<script type="text/javascript" src="./js_debug/dataObject.js" ></script>
+	<script type="text/javascript" src="./js_debug/agentAccess.js" ></script>
+	<script type="text/javascript" src="./js_debug/groupPermission.js" ></script>
+	<script type="text/javascript" src="./js_debug/zit.js" ></script>
+	<script type="text/javascript" src="./js_debug/user.js" ></script>
+    	<script type="text/javascript" src="./js_debug/elementFiltering.js" ></script>
+	<script type="text/javascript" src="./js_debug/messages.js" ></script>
+    <script type="text/javascript">
+      Ext.BLANK_IMAGE_URL = './images/default/s.gif';
+    </script> 
+  </head>
+  <body>
+  <!-- This is added to assist with a IE Bug.-->
+  &nbsp;<img src="http://www.openzis.org/images/ZISLogo-Black.png" height="30px" width="106px"/>
+  <div id="agentHtml">
+  </div>
+  </body>
+<script type="text/javascript">
+  <?php
+	if($this->validUser){
+		echo 'main.validUser = true;
+';
+		if(isset($_SESSION['ADMIN_LEVEL'])){
+			echo 'main.ADMIN_LEVEL = '.$_SESSION['ADMIN_LEVEL'].';
+';
+		}
+		echo 'main.LIC = "'. $_SESSION['OPENZISKEYHOLE'].'";
+';
+		
+		$versions = Version::getAllVersions();
+		foreach($versions as $version){
+			echo 'zones.versions.push({id:'.$version->id.',desc:"'.$version->desc.'",groups:'.$version->numGroups.'});
+';
+		}
+
+		$levels = ZitAdmin::getAdminLevels();
+		foreach($levels as $level){
+			$desc = $level['DESC'];
+			$id   = $level['ID'];
+			echo 'user.adminLevels.push({id:'.$id.', desc:"'.$desc.'"});
+			';
+		}
+		
+	}
+	else{
+	/*
+		echo 'main.validUser = false;main.ADMIN_LEVEL = 0;';
+	*/
+		if(isset($_SESSION['ADMIN_LEVEL'])){
+			echo 'main.ADMIN_LEVEL = '.$_SESSION['ADMIN_LEVEL'].';
+			';
+		}
+		
+		$token = md5(uniqid());
+		$better_token = md5(uniqid(rand(), true));
+		$key = strtoupper($better_token);
+		$_SESSION['OPENZISKEYHOLE'] = $key;
+		
+		echo 'main.LIC = "'. $_SESSION['OPENZISKEYHOLE'].'";
+		';
+		
+		if($this->errorMsg != null){
+			echo "setTimeout(\"Ext.Msg.alert('Login Failed!', '".$this->errorMsg."')\", 1000);";
+		}
+	}
+	echo '</script>';
+  ?>
+</html>

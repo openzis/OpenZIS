@@ -1,0 +1,216 @@
+<!-- 
+	Flow Control WSDL
+	
+	The Flow Control Service interface is supported only by PushMode Agents (mandatory).  The 
+	operations here are duplicated in the Administrate_Provision WSDL supported by the ZIS.
+	
+	There is a single Port Type, and it is bound to SOAP 1.1. The Service has its URL address 
+	set to the anonymous URI. The developer need only set this address to the actual URL that the 
+	service will be deployed at and this WSDL file will be complete.  It is recommended that this
+	URL be identical to that of all other SIF Web Service interfaces supported by the PUSH Mode Agent
+	it encapsulates.
+	
+	The ZIS invokes Flow Control service operations to control the flow of incoming asynchronous 
+	messages from the PushMode Agent. 
+	
+	Namespaces:
+	tns:  FlowControl WSDL
+	comm: SIF Common WSDL Messages
+	sift: SIFHeader XSD
+	sifm: SIF Message XSD (independent of Data Model)
+	
+-->
+
+
+<definitions
+	name="FlowControl"
+	targetNamespace="http://www.sifassociation.org/contract/FlowControl/2.x"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:tns="http://www.sifassociation.org/contract/FlowControl/2.x"
+	
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+		
+	xmlns:comm="http://www.sifassociation.org/contract/Common/2.x" 
+	xmlns:sift="http://www.sifassociation.org/transport/soap/2.x"
+	xmlns:sifm="http://www.sifassociation.org/message/soap/2.x"
+	xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"
+		
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+	>
+	
+		
+	<documentation>Version 2.5</documentation>
+	
+	<!-- 	Import Common WSDL with messages -->
+	<import namespace="http://www.sifassociation.org/contract/Common/2.x"
+		location="Common-7.wsdl"></import>
+	
+	<types>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://www.sifassociation.org/contract/FlowControl/2.x"
+			xmlns="http://www.sifassociation.org/contract/FlowControl/2.x"
+			elementFormDefault="qualified">
+			<xs:import namespace="http://www.sifassociation.org/transport/soap/2.x" 
+				schemaLocation="Transport-1.xsd"></xs:import>
+			<xs:import namespace="http://www.sifassociation.org/message/soap/2.x" 
+				schemaLocation="Messaging-1.xsd"></xs:import>
+			
+			<!-- The following imports may have to be done to satisfy tools which don't have these standard namespaces prestored:
+				soap-env, wsaw 
+				Other standard namespaces above (wsp, wsam, wsa, soap) may have to have imported contents as well 
+				<xs:import namespace="http://schemas.xmlsoap.org/soap/envelope/"
+				schemaLocation="http://schemas.xmlsoap.org/soap/envelope/"></xs:import>
+				<xs:import namespace="http://www.w3.org/2006/05/addressing/wsdl"
+				schemaLocation="http://www.w3.org/2007/02/addressing/metadata/ws-addr-metadata.xsd"></xs:import> 
+			-->			
+			
+		</xs:schema>
+		
+		
+		<xs:annotation>
+			<xs:documentation>
+			The following operations are supported by the FlowControl Port
+			
+			   Ping
+			   Sleep
+			   Wakeup
+			   
+			</xs:documentation>
+		</xs:annotation>
+		
+	</types>
+
+	<portType name="ptFlowControl">
+		
+		<operation name="Ping">
+			<input name="PingRequest" message="comm:Ping"></input>
+			<output name="PongResponse" message="comm:Status"></output>
+			<fault 
+				wsaw:Action="http://www.sifassociation.org/contract/FlowControl/2.x/PingFault"
+				name="PingError" message="comm:TransportError">
+			</fault>
+		</operation>
+
+		<operation name="Sleep">
+			<input name="SleepRequest" message="comm:Sleep"></input>
+			<output name="SleepStatus" message="comm:Status"></output>
+			<fault
+				wsaw:Action="http://www.sifassociation.org/contract/FlowControl/2.x/SleepFault"
+				name="SleepError" message="comm:TransportError">
+			</fault>
+		</operation>
+		
+		<operation name="Wakeup">
+			<input name="WakeupRequest" message="comm:Wakeup"></input>
+			<output name="WakeupStatus" message="comm:Status"></output>
+			<fault
+				wsaw:Action="http://www.sifassociation.org/contract/FlowControl/2.x/WakeupFault"
+				name="WakeupError" message="comm:TransportError">
+			</fault>
+		</operation>
+
+
+	</portType>
+	
+	<!-- 
+		Basically we are enforcing WS-Addressing in the binding to this port type.
+		The wsa:Actions will be generated automatically according to the default algorithm
+		(targetnamespace/portname/operation name)
+		
+		Per Port
+			<wsp:Policy>
+				<wsam:Addressing>
+					<wsp:Policy><wsam:AnonymousResponses/></wsp:Policy>/>
+				</wsam:Addressing>
+			</wsp:Policy>
+			
+		Per Operation
+			<wsp:Policy>
+				<wsam:Addressing>
+					<wsp:Policy><wsam:AnonymousResponses/></wsp:Policy>/>
+				</wsam:Addressing>
+			</wsp:Policy>
+		
+		All operations will be anonymous (send back response on same HTTP channel). On some
+		platforms this doesn't inherit, and BP 1.2 requires this policy to be reasserted for
+		each operation.
+		
+		Because WS-Addressing is being used to define the actions, a SOAP Action does not
+		have to be defined for each operation. It may be removed from the binding below.
+		   
+		   For the "Ping" operation, this takes the following form.
+		
+		      soapAction="http://www.sifassociation.org/contract/FlowControl-S11/2.x/Ping"
+	-->	
+	
+	<binding name = "FlowControl-S11" type="tns:ptFlowControl">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/> 
+	
+		
+		<operation name="Ping">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/FlowControl-S11/2.x/Ping" 
+				style="document"/>
+			<input name="PingRequest"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Ping" part="hdr" use="literal"/>
+			</input>
+			<output name="PongResponse">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="PingError">
+				<soap:fault name="PingError" use="literal"/>
+			</fault>
+		</operation>
+		
+		<operation name="Sleep">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/FlowControl-S11/2.x/Sleep" 
+				style="document"/>
+			<input name="SleepRequest"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Sleep" part="hdr" use="literal"/>
+			</input>
+			<output name="SleepStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="SleepError">
+				<soap:fault name="SleepError" use="literal"/>
+			</fault>
+		</operation>
+		
+		<operation name="Wakeup">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/FlowControl-S11/2.x/Wakeup" 
+				style="document"/>
+			<input name="WakeupRequest"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Wakeup" part="hdr" use="literal"/>
+			</input>
+			<output name="WakeupStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="WakeupError">
+				<soap:fault name="WakeupError" use="literal"/>
+			</fault>
+		</operation>
+
+	</binding>
+	
+	
+   <service name="SIFFlowControl">
+   	<port name="FlowControl" binding="tns:FlowControl-S11">
+   		
+   		<!-- Anonymous URI - replace with deployed FlowControl Service URL -->
+   		<soap:address location="http://www.w3.org/2005/08/addressing/anonymous"></soap:address>
+   		
+   	</port>
+   </service>
+		
+</definitions>

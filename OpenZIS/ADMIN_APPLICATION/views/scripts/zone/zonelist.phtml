@@ -1,0 +1,16 @@
+<table class="zoneList">
+<?php
+$counter = 0;
+foreach($this->zones as $zone){
+	if(($counter % 2) == 0){
+		echo '<tr class="zoneListEven" onclick="zones.showEditZone(\''.$zone->zoneDesc.'\', '.$zone->zoneId.');"><td>'.$zone->zoneDesc.'</td></tr>';
+	}
+	else{
+		echo '<tr class="zoneListOdd" onclick="zones.showEditZone(\''.$zone->zoneDesc.'\', '.$zone->zoneId.');"><td>'.$zone->zoneDesc.'</td></tr>';
+	}
+	$counter++;
+}
+
+?>
+<tr><td><input type="button" class="button" value="Add +" onclick="zones.showAddZone();"/></td></tr>
+</table>

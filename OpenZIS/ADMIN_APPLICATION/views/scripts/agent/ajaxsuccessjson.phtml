@@ -1,0 +1,10 @@
+{"success":true<?php
+if($this->agentJson != null){
+	echo $this->agentJson.$this->permissionJson;
+}
+else
+if($this->json){
+	echo ',"agents":'.$this->json;
+}
+echo '}';
+

@@ -1,0 +1,1841 @@
+<!--
+		SIF Web Services:Soap Body Implementation Specification 2.5 (December 15, 2010) Infrastructure Version: 2.5-2
+	-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="http://www.sifassociation.org/message/soap/2.x" xmlns:sif="http://www.sifassociation.org/message/soap/2.x" elementFormDefault="qualified">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="imports/xml/xml.xsd" />
+
+  <!--Infrastructure Common Elements-->
+
+
+  <!--ExtendedElements-->
+
+  <xs:complexType name="ExtendedElementsType">
+    <xs:sequence>
+      <xs:element name="ExtendedElement" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="sif:ExtendedContentType">
+              <xs:attribute name="Name" use="required" type="xs:normalizedString" />
+              <!--<xs:attribute ref="xsi:type" use="optional" />-->
+              <xs:attribute name="Action" use="optional">
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="Delete" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="ExtendedElements" type="sif:ExtendedElementsType">
+    <xs:key name="ExtendedElementsKey1">
+      <xs:selector xpath="./sif:ExtendedElement" />
+      <xs:field xpath="@Name" />
+    </xs:key>
+  </xs:element>
+
+
+  <!--AuthenticationLevel-->
+
+  <xs:simpleType name="AuthenticationLevelType">
+    <xs:restriction base="xs:unsignedInt">
+      <xs:enumeration value="0" />
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="AuthenticationLevel" type="sif:AuthenticationLevelType" />
+
+
+  <!--Contexts-->
+
+  <xs:complexType name="ContextsType">
+    <xs:sequence>
+      <xs:element ref="sif:Context" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="Contexts" type="sif:ContextsType" />
+
+
+  <!--Context-->
+
+  <xs:simpleType name="ContextType">
+    <xs:restriction>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="Context" type="sif:ContextType" />
+
+
+  <!--Protocol-->
+
+  <xs:complexType name="ProtocolType">
+    <xs:sequence>
+      <xs:element name="URL" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:anyURI">
+            <xs:maxLength value="256" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="Property" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Name">
+              <xs:simpleType>
+                <xs:restriction base="xs:token">
+                  <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="Value">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:maxLength value="256" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="Type" use="required">
+      <xs:simpleType>
+        <xs:union>
+          <xs:simpleType>
+            <xs:restriction base="sif:DefinedProtocolsType" />
+          </xs:simpleType>
+          <xs:simpleType>
+            <xs:restriction base="xs:token" />
+          </xs:simpleType>
+        </xs:union>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="Secure" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="Yes" />
+          <xs:enumeration value="No" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:element name="Protocol" type="sif:ProtocolType" />
+
+
+  <!--EncryptionLevel-->
+
+  <xs:simpleType name="EncryptionLevelType">
+    <xs:restriction base="xs:unsignedInt">
+      <xs:enumeration value="0" />
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="EncryptionLevel" type="sif:EncryptionLevelType" />
+
+
+  <!--Infrastructure Messages-->
+
+
+  <!--Status-->
+
+  <xs:complexType name="StatusType">
+    <xs:sequence>
+      <xs:element name="Code" type="sif:InfrastructureStatusCodeType" />
+      <xs:element name="Desc" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="1024" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="Status" type="sif:StatusType" />
+
+
+  <!--DataModelError-->
+
+  <xs:complexType name="DataModelErrorType">
+    <xs:sequence>
+      <xs:element name="Category" type="sif:InfrastructureErrorCategoryType" />
+      <xs:element name="Code">
+        <xs:simpleType>
+          <xs:union>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureXMLValidationErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureEncryptionErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureAuthenticationErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureAccessAndPermissionErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureRegistrationErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureProvisionErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureSubscriptionErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureRequestAndResponseErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureEventReportingAndProcessingErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureTransportErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureSystemErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureGenericMessageHandlingErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="xs:token" />
+            </xs:simpleType>
+          </xs:union>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="Desc">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="1024" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="ExtendedDesc" minOccurs="0" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="DataModelError" type="sif:DataModelErrorType" />
+
+
+  <!--Provide-->
+
+  <xs:complexType name="ProvideType">
+    <xs:sequence>
+      <xs:element name="Object" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ExtendedQuerySupport" minOccurs="0" type="xs:boolean" />
+            <xs:element ref="sif:Contexts" minOccurs="0" />
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="xs:token" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="Provide" type="sif:ProvideType" />
+
+
+  <!--Provision-->
+
+  <xs:complexType name="ProvisionType">
+    <xs:sequence>
+      <xs:element name="ProvideObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="ExtendedQuerySupport" minOccurs="0" type="xs:boolean" />
+                  <xs:element ref="sif:Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SubscribeObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="PublishAddObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="PublishChangeObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="PublishDeleteObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="RequestObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="ExtendedQuerySupport" minOccurs="0" type="xs:boolean" />
+                  <xs:element ref="sif:Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="RespondObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="ExtendedQuerySupport" minOccurs="0" type="xs:boolean" />
+                  <xs:element ref="sif:Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ProvideService" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Service" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ServiceName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="RespondService" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Service" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ServiceName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="RequestService" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Service" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:Contexts" minOccurs="0" />
+                  <xs:element name="Operations" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="Operation" maxOccurs="unbounded" type="xs:token" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="ServiceName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SubscribeService" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Service" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:Contexts" minOccurs="0" />
+                  <xs:element name="Operations" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="Operation" maxOccurs="unbounded" type="xs:token" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="ServiceName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="Provision" type="sif:ProvisionType" />
+
+
+  <!--Register-->
+
+  <xs:complexType name="RegisterType">
+    <xs:sequence>
+      <xs:element name="Name">
+        <xs:simpleType>
+          <xs:restriction base="xs:normalizedString">
+            <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="Version" maxOccurs="unbounded" type="sif:VersionWithWildcardsType" />
+      <xs:element name="MaxBufferSize" type="xs:unsignedInt" />
+      <xs:element name="Mode">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Push" />
+            <xs:enumeration value="Pull" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element ref="sif:Protocol" minOccurs="0" />
+      <xs:element name="NodeVendor" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:normalizedString">
+            <xs:maxLength value="256" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="NodeVersion" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:normalizedString">
+            <xs:maxLength value="32" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="Application" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Vendor">
+              <xs:simpleType>
+                <xs:restriction base="xs:normalizedString">
+                  <xs:maxLength value="256" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="Product">
+              <xs:simpleType>
+                <xs:restriction base="xs:normalizedString">
+                  <xs:maxLength value="256" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="Version">
+              <xs:simpleType>
+                <xs:restriction base="xs:normalizedString">
+                  <xs:maxLength value="32" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Icon" minOccurs="0" type="xs:anyURI" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="Register" type="sif:RegisterType" />
+
+
+  <!--Query-->
+
+  <xs:complexType name="QueryType">
+    <xs:sequence>
+      <xs:element name="QueryObject">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Element" minOccurs="0" maxOccurs="unbounded" type="xs:normalizedString" />
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="xs:token" />
+        </xs:complexType>
+      </xs:element>
+      <xs:choice minOccurs="0">
+        <xs:element name="ConditionGroup">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Conditions" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Condition" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Element" type="xs:normalizedString" />
+                          <xs:element name="Operator">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:token">
+                                <xs:enumeration value="EQ" />
+                                <xs:enumeration value="LT" />
+                                <xs:enumeration value="GT" />
+                                <xs:enumeration value="LE" />
+                                <xs:enumeration value="GE" />
+                                <xs:enumeration value="NE" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="Value" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="Type" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:token">
+                        <xs:enumeration value="And" />
+                        <xs:enumeration value="Or" />
+                        <xs:enumeration value="None" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="Type" use="required">
+              <xs:simpleType>
+                <xs:restriction base="xs:token">
+                  <xs:enumeration value="And" />
+                  <xs:enumeration value="Or" />
+                  <xs:enumeration value="None" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Example">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:any namespace="##other" processContents="lax" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="Query" type="sif:QueryType" />
+
+
+  <!--ExtendedQuery-->
+
+  <xs:complexType name="ExtendedQueryType">
+    <xs:sequence>
+      <xs:element name="DestinationProvider" minOccurs="0" type="xs:token" />
+      <xs:element name="Select">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Element" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:normalizedString">
+                    <xs:attribute name="Alias" use="optional">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:normalizedString">
+                          <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                    <xs:attribute name="ObjectName" use="required" type="xs:token" />
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="Distinct" use="required" type="xs:boolean" />
+          <xs:attribute name="RowCount" use="required">
+            <xs:simpleType>
+              <xs:union>
+                <xs:simpleType>
+                  <xs:restriction base="xs:positiveInteger" />
+                </xs:simpleType>
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="All" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:union>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="From">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Join" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="JoinOn" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="LeftElement">
+                          <xs:complexType>
+                            <xs:simpleContent>
+                              <xs:extension base="xs:normalizedString">
+                                <xs:attribute name="ObjectName" use="required" type="xs:token" />
+                              </xs:extension>
+                            </xs:simpleContent>
+                          </xs:complexType>
+                        </xs:element>
+                        <xs:element name="RightElement">
+                          <xs:complexType>
+                            <xs:simpleContent>
+                              <xs:extension base="xs:normalizedString">
+                                <xs:attribute name="ObjectName" use="required" type="xs:token" />
+                              </xs:extension>
+                            </xs:simpleContent>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="Type" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="Inner" />
+                      <xs:enumeration value="LeftOuter" />
+                      <xs:enumeration value="RightOuter" />
+                      <xs:enumeration value="FullOuter" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="xs:token" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Where" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ConditionGroup">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Conditions" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="Condition" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="Element">
+                                <xs:complexType>
+                                  <xs:simpleContent>
+                                    <xs:extension base="xs:normalizedString">
+                                      <xs:attribute name="ObjectName" use="required" type="xs:token" />
+                                    </xs:extension>
+                                  </xs:simpleContent>
+                                </xs:complexType>
+                              </xs:element>
+                              <xs:element name="Operator">
+                                <xs:simpleType>
+                                  <xs:restriction base="xs:token">
+                                    <xs:enumeration value="EQ" />
+                                    <xs:enumeration value="LT" />
+                                    <xs:enumeration value="GT" />
+                                    <xs:enumeration value="LE" />
+                                    <xs:enumeration value="GE" />
+                                    <xs:enumeration value="NE" />
+                                  </xs:restriction>
+                                </xs:simpleType>
+                              </xs:element>
+                              <xs:element name="Value" type="xs:string" />
+                            </xs:sequence>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                      <xs:attribute name="Type" use="required">
+                        <xs:simpleType>
+                          <xs:restriction base="xs:token">
+                            <xs:enumeration value="And" />
+                            <xs:enumeration value="Or" />
+                            <xs:enumeration value="None" />
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="Type" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="And" />
+                      <xs:enumeration value="Or" />
+                      <xs:enumeration value="None" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="OrderBy" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Element" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:normalizedString">
+                    <xs:attribute name="ObjectName" use="required" type="xs:token" />
+                    <xs:attribute name="Ordering" use="required">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:token">
+                          <xs:enumeration value="Ascending" />
+                          <xs:enumeration value="Descending" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="ExtendedQuery" type="sif:ExtendedQueryType" />
+
+
+  <!--QueryResults-->
+
+  <xs:complexType name="QueryResultsType">
+    <xs:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:any namespace="##other" processContents="lax" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="QueryResults" type="sif:QueryResultsType" />
+
+
+  <!--ExtendedQueryResults-->
+
+  <xs:complexType name="ExtendedQueryResultsType">
+    <xs:sequence>
+      <xs:element name="ColumnHeaders">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Element" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:normalizedString">
+                    <xs:attribute name="ObjectName" use="required" type="xs:token" />
+                    <xs:attribute name="Alias" use="optional">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:normalizedString">
+                          <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                    <!--<xs:attribute ref="xsi:type" use="optional" />-->
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Rows">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="R" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="C" maxOccurs="unbounded" type="sif:SelectedContentType" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="ExtendedQueryResults" type="sif:ExtendedQueryResultsType" />
+
+
+  <!--Event-->
+
+  <xs:complexType name="EventType">
+    <xs:sequence>
+      <xs:any namespace="##other" processContents="lax" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="Event" type="sif:EventType" />
+
+
+  <!--Subscribe-->
+
+  <xs:complexType name="SubscribeType">
+    <xs:sequence>
+      <xs:element name="Object" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sif:Contexts" minOccurs="0" />
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="xs:token" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="Subscribe" type="sif:SubscribeType" />
+
+
+  <!--Ping-->
+
+  <xs:complexType name="PingType" />
+
+  <xs:element name="Ping" type="sif:PingType" />
+
+
+  <!--Sleep-->
+
+  <xs:complexType name="SleepType" />
+
+  <xs:element name="Sleep" type="sif:SleepType" />
+
+
+  <!--Wakeup-->
+
+  <xs:complexType name="WakeupType" />
+
+  <xs:element name="Wakeup" type="sif:WakeupType" />
+
+
+  <!--GetMessage-->
+
+  <xs:complexType name="GetMessageType" />
+
+  <xs:element name="GetMessage" type="sif:GetMessageType" />
+
+
+  <!--GetZoneStatus-->
+
+  <xs:complexType name="GetZoneStatusType" />
+
+  <xs:element name="GetZoneStatus" type="sif:GetZoneStatusType" />
+
+
+  <!--ZoneStatusResponse-->
+
+  <xs:complexType name="ZoneStatusResponseType">
+    <xs:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:any namespace="##other" processContents="lax" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="ZoneStatusResponse" type="sif:ZoneStatusResponseType" />
+
+
+  <!--GetAgentACL-->
+
+  <xs:complexType name="GetAgentACLType" />
+
+  <xs:element name="GetAgentACL" type="sif:GetAgentACLType" />
+
+
+  <!--AgentACLResponse-->
+
+  <xs:complexType name="AgentACLResponseType">
+    <xs:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:any namespace="##other" processContents="lax" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="AgentACLResponse" type="sif:AgentACLResponseType" />
+
+
+  <!--CancelRequests-->
+
+  <xs:complexType name="CancelRequestsType">
+    <xs:sequence>
+      <xs:element name="NotificationType">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Standard" />
+            <xs:enumeration value="None" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="RequestMsgIds">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestMsgId" maxOccurs="unbounded" type="sif:MsgIdType" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="CancelRequests" type="sif:CancelRequestsType" />
+
+
+  <!--CancelServiceInputs-->
+
+  <xs:complexType name="CancelServiceInputsType">
+    <xs:sequence>
+      <xs:element name="NotificationType">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Standard" />
+            <xs:enumeration value="None" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="ServiceMsgIds">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ServiceMsgId" maxOccurs="unbounded" type="sif:MsgIdType" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="CancelServiceInputs" type="sif:CancelServiceInputsType" />
+
+
+  <!--Unprovide-->
+
+  <xs:complexType name="UnprovideType">
+    <xs:sequence>
+      <xs:element name="Object" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sif:Contexts" minOccurs="0" />
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="xs:token" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="Unprovide" type="sif:UnprovideType" />
+
+
+  <!--Unregister-->
+
+  <xs:complexType name="UnregisterType" />
+
+  <xs:element name="Unregister" type="sif:UnregisterType" />
+
+
+  <!--Unsubscribe-->
+
+  <xs:complexType name="UnsubscribeType">
+    <xs:sequence>
+      <xs:element name="Object" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sif:Contexts" minOccurs="0" />
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="xs:token" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="Unsubscribe" type="sif:UnsubscribeType" />
+
+
+  <!--ServiceInput-->
+
+  <xs:complexType name="ServiceInputType">
+    <xs:sequence>
+      <xs:any namespace="##other" processContents="lax" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="ServiceInput" type="sif:ServiceInputType" />
+
+
+  <!--ServiceOutput-->
+
+  <xs:complexType name="ServiceOutputType">
+    <xs:sequence>
+      <xs:any namespace="##other" processContents="lax" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="ServiceOutput" type="sif:ServiceOutputType" />
+
+
+  <!--ServiceNotify-->
+
+  <xs:complexType name="ServiceNotifyType">
+    <xs:sequence>
+      <xs:any namespace="##other" processContents="lax" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="ServiceNotify" type="sif:ServiceNotifyType" />
+
+
+  <!--Infrastructure Data Objects-->
+
+
+  <!--Data Model Common Elements-->
+
+  <xs:simpleType name="InfrastructureStatusCodeType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="0" />
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="8" />
+      <xs:enumeration value="9" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureErrorCategoryType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="0" />
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="5" />
+      <xs:enumeration value="6" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="8" />
+      <xs:enumeration value="9" />
+      <xs:enumeration value="10" />
+      <xs:enumeration value="11" />
+      <xs:enumeration value="12" />
+      <xs:enumeration value="13" />
+      <xs:enumeration value="14" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureXMLValidationErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="6" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureEncryptionErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureAuthenticationErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="5" />
+      <xs:enumeration value="6" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="8" />
+      <xs:enumeration value="9" />
+      <xs:enumeration value="10" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureAccessAndPermissionErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="5" />
+      <xs:enumeration value="6" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="8" />
+      <xs:enumeration value="9" />
+      <xs:enumeration value="10" />
+      <xs:enumeration value="11" />
+      <xs:enumeration value="12" />
+      <xs:enumeration value="13" />
+      <xs:enumeration value="14" />
+      <xs:enumeration value="15" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureRegistrationErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="6" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="9" />
+      <xs:enumeration value="10" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureProvisionErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureSubscriptionErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureRequestAndResponseErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="8" />
+      <xs:enumeration value="9" />
+      <xs:enumeration value="10" />
+      <xs:enumeration value="11" />
+      <xs:enumeration value="12" />
+      <xs:enumeration value="13" />
+      <xs:enumeration value="14" />
+      <xs:enumeration value="15" />
+      <xs:enumeration value="16" />
+      <xs:enumeration value="17" />
+      <xs:enumeration value="18" />
+      <xs:enumeration value="19" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureEventReportingAndProcessingErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureTransportErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureSystemErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureGenericMessageHandlingErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="5" />
+      <xs:enumeration value="6" />
+      <xs:enumeration value="7" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureSMBErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureSIFZoneServiceErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="5" />
+      <xs:enumeration value="6" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="8" />
+      <xs:enumeration value="9" />
+      <xs:enumeration value="10" />
+      <xs:enumeration value="11" />
+      <xs:enumeration value="12" />
+      <xs:enumeration value="13" />
+      <xs:enumeration value="14" />
+      <xs:enumeration value="15" />
+      <xs:enumeration value="16" />
+      <xs:enumeration value="17" />
+      <xs:enumeration value="18" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LogEntrySuccessCategoryType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LogEntryDataIssuesWithSuccessResultType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LogEntryDataIssuesWithFailureResultType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LogEntryAgentErrorConditionType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LogEntryZISErrorConditionType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="5" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ISO31663CodeForFormerlyUsedNamesOfCountriesType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="AIDJ" />
+      <xs:enumeration value="BQAQ" />
+      <xs:enumeration value="BUMM" />
+      <xs:enumeration value="CSHH" />
+      <xs:enumeration value="CTKI" />
+      <xs:enumeration value="DDDE" />
+      <xs:enumeration value="DYBJ" />
+      <xs:enumeration value="FQHH" />
+      <xs:enumeration value="FXFR" />
+      <xs:enumeration value="GEHH" />
+      <xs:enumeration value="HVBF" />
+      <xs:enumeration value="JTUM" />
+      <xs:enumeration value="MIUM" />
+      <xs:enumeration value="NHVU" />
+      <xs:enumeration value="NQAQ" />
+      <xs:enumeration value="NTHH" />
+      <xs:enumeration value="PCHH" />
+      <xs:enumeration value="PUUM" />
+      <xs:enumeration value="PZPA" />
+      <xs:enumeration value="RHZW" />
+      <xs:enumeration value="SKIN" />
+      <xs:enumeration value="SUHH" />
+      <xs:enumeration value="TPTL" />
+      <xs:enumeration value="VDVN" />
+      <xs:enumeration value="WKUM" />
+      <xs:enumeration value="YDYE" />
+      <xs:enumeration value="YUCS" />
+      <xs:enumeration value="ZRCD" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ISO31661EnglishCountryNamesAndCodeElementsType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="AF" />
+      <xs:enumeration value="AX" />
+      <xs:enumeration value="AL" />
+      <xs:enumeration value="DZ" />
+      <xs:enumeration value="AS" />
+      <xs:enumeration value="AD" />
+      <xs:enumeration value="AO" />
+      <xs:enumeration value="AI" />
+      <xs:enumeration value="AQ" />
+      <xs:enumeration value="AG" />
+      <xs:enumeration value="AR" />
+      <xs:enumeration value="AM" />
+      <xs:enumeration value="AW" />
+      <xs:enumeration value="AU" />
+      <xs:enumeration value="AT" />
+      <xs:enumeration value="AZ" />
+      <xs:enumeration value="BS" />
+      <xs:enumeration value="BH" />
+      <xs:enumeration value="BD" />
+      <xs:enumeration value="BB" />
+      <xs:enumeration value="BY" />
+      <xs:enumeration value="BE" />
+      <xs:enumeration value="BZ" />
+      <xs:enumeration value="BJ" />
+      <xs:enumeration value="BM" />
+      <xs:enumeration value="BT" />
+      <xs:enumeration value="BO" />
+      <xs:enumeration value="BA" />
+      <xs:enumeration value="BW" />
+      <xs:enumeration value="BV" />
+      <xs:enumeration value="BR" />
+      <xs:enumeration value="IO" />
+      <xs:enumeration value="BN" />
+      <xs:enumeration value="BG" />
+      <xs:enumeration value="BF" />
+      <xs:enumeration value="BI" />
+      <xs:enumeration value="KH" />
+      <xs:enumeration value="CM" />
+      <xs:enumeration value="CA" />
+      <xs:enumeration value="CV" />
+      <xs:enumeration value="KY" />
+      <xs:enumeration value="CF" />
+      <xs:enumeration value="TD" />
+      <xs:enumeration value="CL" />
+      <xs:enumeration value="CN" />
+      <xs:enumeration value="CX" />
+      <xs:enumeration value="CC" />
+      <xs:enumeration value="CO" />
+      <xs:enumeration value="KM" />
+      <xs:enumeration value="CG" />
+      <xs:enumeration value="CD" />
+      <xs:enumeration value="CK" />
+      <xs:enumeration value="CR" />
+      <xs:enumeration value="CI" />
+      <xs:enumeration value="HR" />
+      <xs:enumeration value="CU" />
+      <xs:enumeration value="CY" />
+      <xs:enumeration value="CZ" />
+      <xs:enumeration value="DK" />
+      <xs:enumeration value="DJ" />
+      <xs:enumeration value="DM" />
+      <xs:enumeration value="DO" />
+      <xs:enumeration value="EC" />
+      <xs:enumeration value="EG" />
+      <xs:enumeration value="SV" />
+      <xs:enumeration value="GQ" />
+      <xs:enumeration value="ER" />
+      <xs:enumeration value="EE" />
+      <xs:enumeration value="ET" />
+      <xs:enumeration value="FK" />
+      <xs:enumeration value="FO" />
+      <xs:enumeration value="FJ" />
+      <xs:enumeration value="FI" />
+      <xs:enumeration value="FR" />
+      <xs:enumeration value="GF" />
+      <xs:enumeration value="PF" />
+      <xs:enumeration value="TF" />
+      <xs:enumeration value="GA" />
+      <xs:enumeration value="GM" />
+      <xs:enumeration value="GE" />
+      <xs:enumeration value="DE" />
+      <xs:enumeration value="GH" />
+      <xs:enumeration value="GI" />
+      <xs:enumeration value="GR" />
+      <xs:enumeration value="GL" />
+      <xs:enumeration value="GD" />
+      <xs:enumeration value="GP" />
+      <xs:enumeration value="GU" />
+      <xs:enumeration value="GT" />
+      <xs:enumeration value="GG" />
+      <xs:enumeration value="GN" />
+      <xs:enumeration value="GW" />
+      <xs:enumeration value="GY" />
+      <xs:enumeration value="HT" />
+      <xs:enumeration value="HM" />
+      <xs:enumeration value="VA" />
+      <xs:enumeration value="HN" />
+      <xs:enumeration value="HK" />
+      <xs:enumeration value="HU" />
+      <xs:enumeration value="IS" />
+      <xs:enumeration value="IN" />
+      <xs:enumeration value="ID" />
+      <xs:enumeration value="IR" />
+      <xs:enumeration value="IQ" />
+      <xs:enumeration value="IE" />
+      <xs:enumeration value="IM" />
+      <xs:enumeration value="IL" />
+      <xs:enumeration value="IT" />
+      <xs:enumeration value="JM" />
+      <xs:enumeration value="JP" />
+      <xs:enumeration value="JE" />
+      <xs:enumeration value="JO" />
+      <xs:enumeration value="KZ" />
+      <xs:enumeration value="KE" />
+      <xs:enumeration value="KI" />
+      <xs:enumeration value="KP" />
+      <xs:enumeration value="KR" />
+      <xs:enumeration value="KW" />
+      <xs:enumeration value="KG" />
+      <xs:enumeration value="LA" />
+      <xs:enumeration value="LV" />
+      <xs:enumeration value="LB" />
+      <xs:enumeration value="LS" />
+      <xs:enumeration value="LR" />
+      <xs:enumeration value="LY" />
+      <xs:enumeration value="LI" />
+      <xs:enumeration value="LT" />
+      <xs:enumeration value="LU" />
+      <xs:enumeration value="MO" />
+      <xs:enumeration value="MK" />
+      <xs:enumeration value="MG" />
+      <xs:enumeration value="MW" />
+      <xs:enumeration value="MY" />
+      <xs:enumeration value="MV" />
+      <xs:enumeration value="ML" />
+      <xs:enumeration value="MT" />
+      <xs:enumeration value="MH" />
+      <xs:enumeration value="MQ" />
+      <xs:enumeration value="MR" />
+      <xs:enumeration value="MU" />
+      <xs:enumeration value="YT" />
+      <xs:enumeration value="MX" />
+      <xs:enumeration value="FM" />
+      <xs:enumeration value="MD" />
+      <xs:enumeration value="MC" />
+      <xs:enumeration value="MN" />
+      <xs:enumeration value="MS" />
+      <xs:enumeration value="MA" />
+      <xs:enumeration value="MZ" />
+      <xs:enumeration value="MM" />
+      <xs:enumeration value="NA" />
+      <xs:enumeration value="NR" />
+      <xs:enumeration value="NP" />
+      <xs:enumeration value="NL" />
+      <xs:enumeration value="AN" />
+      <xs:enumeration value="NC" />
+      <xs:enumeration value="NZ" />
+      <xs:enumeration value="NI" />
+      <xs:enumeration value="NE" />
+      <xs:enumeration value="NG" />
+      <xs:enumeration value="NU" />
+      <xs:enumeration value="NF" />
+      <xs:enumeration value="MP" />
+      <xs:enumeration value="NO" />
+      <xs:enumeration value="OM" />
+      <xs:enumeration value="PK" />
+      <xs:enumeration value="PW" />
+      <xs:enumeration value="PS" />
+      <xs:enumeration value="PA" />
+      <xs:enumeration value="PG" />
+      <xs:enumeration value="PY" />
+      <xs:enumeration value="PE" />
+      <xs:enumeration value="PH" />
+      <xs:enumeration value="PN" />
+      <xs:enumeration value="PL" />
+      <xs:enumeration value="PT" />
+      <xs:enumeration value="PR" />
+      <xs:enumeration value="QA" />
+      <xs:enumeration value="RE" />
+      <xs:enumeration value="RO" />
+      <xs:enumeration value="RU" />
+      <xs:enumeration value="RW" />
+      <xs:enumeration value="SH" />
+      <xs:enumeration value="KN" />
+      <xs:enumeration value="LC" />
+      <xs:enumeration value="PM" />
+      <xs:enumeration value="VC" />
+      <xs:enumeration value="WS" />
+      <xs:enumeration value="SM" />
+      <xs:enumeration value="ST" />
+      <xs:enumeration value="SA" />
+      <xs:enumeration value="SN" />
+      <xs:enumeration value="CS" />
+      <xs:enumeration value="SC" />
+      <xs:enumeration value="SL" />
+      <xs:enumeration value="SG" />
+      <xs:enumeration value="SK" />
+      <xs:enumeration value="SI" />
+      <xs:enumeration value="SB" />
+      <xs:enumeration value="SO" />
+      <xs:enumeration value="ZA" />
+      <xs:enumeration value="GS" />
+      <xs:enumeration value="ES" />
+      <xs:enumeration value="LK" />
+      <xs:enumeration value="SD" />
+      <xs:enumeration value="SR" />
+      <xs:enumeration value="SJ" />
+      <xs:enumeration value="SZ" />
+      <xs:enumeration value="SE" />
+      <xs:enumeration value="CH" />
+      <xs:enumeration value="SY" />
+      <xs:enumeration value="TW" />
+      <xs:enumeration value="TJ" />
+      <xs:enumeration value="TZ" />
+      <xs:enumeration value="TH" />
+      <xs:enumeration value="TL" />
+      <xs:enumeration value="TG" />
+      <xs:enumeration value="TK" />
+      <xs:enumeration value="TO" />
+      <xs:enumeration value="TT" />
+      <xs:enumeration value="TN" />
+      <xs:enumeration value="TR" />
+      <xs:enumeration value="TM" />
+      <xs:enumeration value="TC" />
+      <xs:enumeration value="TV" />
+      <xs:enumeration value="UG" />
+      <xs:enumeration value="UA" />
+      <xs:enumeration value="AE" />
+      <xs:enumeration value="GB" />
+      <xs:enumeration value="US" />
+      <xs:enumeration value="UM" />
+      <xs:enumeration value="UY" />
+      <xs:enumeration value="UZ" />
+      <xs:enumeration value="VU" />
+      <xs:enumeration value="VA" />
+      <xs:enumeration value="VE" />
+      <xs:enumeration value="VN" />
+      <xs:enumeration value="VG" />
+      <xs:enumeration value="VI" />
+      <xs:enumeration value="WF" />
+      <xs:enumeration value="EH" />
+      <xs:enumeration value="YE" />
+      <xs:enumeration value="CD" />
+      <xs:enumeration value="ZM" />
+      <xs:enumeration value="ZW" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ISO4217CurrencyNamesAndCodeElementsType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="AED" />
+      <xs:enumeration value="AFN" />
+      <xs:enumeration value="ALL" />
+      <xs:enumeration value="AMD" />
+      <xs:enumeration value="ANG" />
+      <xs:enumeration value="AOA" />
+      <xs:enumeration value="ARS" />
+      <xs:enumeration value="AUD" />
+      <xs:enumeration value="AWG" />
+      <xs:enumeration value="AZN" />
+      <xs:enumeration value="BAM" />
+      <xs:enumeration value="BBD" />
+      <xs:enumeration value="BDT" />
+      <xs:enumeration value="BGN" />
+      <xs:enumeration value="BHD" />
+      <xs:enumeration value="BIF" />
+      <xs:enumeration value="BMD" />
+      <xs:enumeration value="BND" />
+      <xs:enumeration value="BOB" />
+      <xs:enumeration value="BOV" />
+      <xs:enumeration value="BRL" />
+      <xs:enumeration value="BSD" />
+      <xs:enumeration value="BTN" />
+      <xs:enumeration value="BWP" />
+      <xs:enumeration value="BYR" />
+      <xs:enumeration value="BZD" />
+      <xs:enumeration value="CAD" />
+      <xs:enumeration value="CDF" />
+      <xs:enumeration value="CHE" />
+      <xs:enumeration value="CHF" />
+      <xs:enumeration value="CHW" />
+      <xs:enumeration value="CLF" />
+      <xs:enumeration value="CLP" />
+      <xs:enumeration value="CNY" />
+      <xs:enumeration value="COP" />
+      <xs:enumeration value="COU" />
+      <xs:enumeration value="CRC" />
+      <xs:enumeration value="CSD" />
+      <xs:enumeration value="CUP" />
+      <xs:enumeration value="CVE" />
+      <xs:enumeration value="CYP" />
+      <xs:enumeration value="CZK" />
+      <xs:enumeration value="DJF" />
+      <xs:enumeration value="DKK" />
+      <xs:enumeration value="DOP" />
+      <xs:enumeration value="DZD" />
+      <xs:enumeration value="EEK" />
+      <xs:enumeration value="EGP" />
+      <xs:enumeration value="ERN" />
+      <xs:enumeration value="ETB" />
+      <xs:enumeration value="EUR" />
+      <xs:enumeration value="FJD" />
+      <xs:enumeration value="FKP" />
+      <xs:enumeration value="GBP" />
+      <xs:enumeration value="GEL" />
+      <xs:enumeration value="GHC" />
+      <xs:enumeration value="GIP" />
+      <xs:enumeration value="GMD" />
+      <xs:enumeration value="GNF" />
+      <xs:enumeration value="GTQ" />
+      <xs:enumeration value="GWP" />
+      <xs:enumeration value="GYD" />
+      <xs:enumeration value="HKD" />
+      <xs:enumeration value="HNL" />
+      <xs:enumeration value="HRK" />
+      <xs:enumeration value="HTG" />
+      <xs:enumeration value="HUF" />
+      <xs:enumeration value="IDR" />
+      <xs:enumeration value="ILS" />
+      <xs:enumeration value="INR" />
+      <xs:enumeration value="IQD" />
+      <xs:enumeration value="IRR" />
+      <xs:enumeration value="ISK" />
+      <xs:enumeration value="JMD" />
+      <xs:enumeration value="JOD" />
+      <xs:enumeration value="JPY" />
+      <xs:enumeration value="KES" />
+      <xs:enumeration value="KGS" />
+      <xs:enumeration value="KHR" />
+      <xs:enumeration value="KMF" />
+      <xs:enumeration value="KPW" />
+      <xs:enumeration value="KRW" />
+      <xs:enumeration value="KWD" />
+      <xs:enumeration value="KYD" />
+      <xs:enumeration value="KZT" />
+      <xs:enumeration value="LAK" />
+      <xs:enumeration value="LBP" />
+      <xs:enumeration value="LKR" />
+      <xs:enumeration value="LRD" />
+      <xs:enumeration value="LSL" />
+      <xs:enumeration value="LTL" />
+      <xs:enumeration value="LVL" />
+      <xs:enumeration value="LYD" />
+      <xs:enumeration value="MAD" />
+      <xs:enumeration value="MDL" />
+      <xs:enumeration value="MGA" />
+      <xs:enumeration value="MKD" />
+      <xs:enumeration value="MMK" />
+      <xs:enumeration value="MNT" />
+      <xs:enumeration value="MOP" />
+      <xs:enumeration value="MRO" />
+      <xs:enumeration value="MTL" />
+      <xs:enumeration value="MUR" />
+      <xs:enumeration value="MVR" />
+      <xs:enumeration value="MWK" />
+      <xs:enumeration value="MXN" />
+      <xs:enumeration value="MXV" />
+      <xs:enumeration value="MYR" />
+      <xs:enumeration value="MZN" />
+      <xs:enumeration value="NAD" />
+      <xs:enumeration value="NGN" />
+      <xs:enumeration value="NIO" />
+      <xs:enumeration value="NOK" />
+      <xs:enumeration value="NPR" />
+      <xs:enumeration value="NZD" />
+      <xs:enumeration value="OMR" />
+      <xs:enumeration value="PAB" />
+      <xs:enumeration value="PEN" />
+      <xs:enumeration value="PGK" />
+      <xs:enumeration value="PHP" />
+      <xs:enumeration value="PKR" />
+      <xs:enumeration value="PLN" />
+      <xs:enumeration value="PYG" />
+      <xs:enumeration value="QAR" />
+      <xs:enumeration value="ROL" />
+      <xs:enumeration value="RON" />
+      <xs:enumeration value="RUB" />
+      <xs:enumeration value="RWF" />
+      <xs:enumeration value="SAR" />
+      <xs:enumeration value="SBD" />
+      <xs:enumeration value="SCR" />
+      <xs:enumeration value="SDD" />
+      <xs:enumeration value="SEK" />
+      <xs:enumeration value="SGD" />
+      <xs:enumeration value="SHP" />
+      <xs:enumeration value="SIT" />
+      <xs:enumeration value="SKK" />
+      <xs:enumeration value="SLL" />
+      <xs:enumeration value="SOS" />
+      <xs:enumeration value="SRD" />
+      <xs:enumeration value="STD" />
+      <xs:enumeration value="SVC" />
+      <xs:enumeration value="SYP" />
+      <xs:enumeration value="SZL" />
+      <xs:enumeration value="THB" />
+      <xs:enumeration value="TJS" />
+      <xs:enumeration value="TMM" />
+      <xs:enumeration value="TND" />
+      <xs:enumeration value="TOP" />
+      <xs:enumeration value="TRY" />
+      <xs:enumeration value="TTD" />
+      <xs:enumeration value="TWD" />
+      <xs:enumeration value="TZS" />
+      <xs:enumeration value="UAH" />
+      <xs:enumeration value="UGX" />
+      <xs:enumeration value="USD" />
+      <xs:enumeration value="USN" />
+      <xs:enumeration value="USS" />
+      <xs:enumeration value="UYU" />
+      <xs:enumeration value="UZS" />
+      <xs:enumeration value="VEB" />
+      <xs:enumeration value="VND" />
+      <xs:enumeration value="VUV" />
+      <xs:enumeration value="WST" />
+      <xs:enumeration value="XAF" />
+      <xs:enumeration value="XAG" />
+      <xs:enumeration value="XAU" />
+      <xs:enumeration value="XBA" />
+      <xs:enumeration value="XBB" />
+      <xs:enumeration value="XBC" />
+      <xs:enumeration value="XBD" />
+      <xs:enumeration value="XCD" />
+      <xs:enumeration value="XDR" />
+      <xs:enumeration value="XFO" />
+      <xs:enumeration value="XFU" />
+      <xs:enumeration value="XOF" />
+      <xs:enumeration value="XPD" />
+      <xs:enumeration value="XPF" />
+      <xs:enumeration value="XPT" />
+      <xs:enumeration value="XTS" />
+      <xs:enumeration value="XXX" />
+      <xs:enumeration value="YER" />
+      <xs:enumeration value="ZAR" />
+      <xs:enumeration value="ZMK" />
+      <xs:enumeration value="ZWN" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!--ObjectNameType-->
+
+  <xs:simpleType name="ObjectNameType">
+    <xs:restriction>
+      <xs:simpleType>
+        <xs:restriction base="xs:NCName">
+          <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!--MsgIdType-->
+
+  <xs:simpleType name="MsgIdType">
+    <xs:restriction base="sif:GUIDType" />
+  </xs:simpleType>
+
+
+  <!--GUIDType-->
+
+  <xs:simpleType name="GUIDType">
+    <xs:restriction>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:pattern value="[0-9A-F]{32}" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!--VersionType-->
+
+  <xs:simpleType name="VersionType">
+    <xs:restriction>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:maxLength value="12" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          <xs:pattern value="[0-9]+[.][0-9]+(r[0-9]+)?" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!--VersionWithWildcardsType-->
+
+  <xs:simpleType name="VersionWithWildcardsType">
+    <xs:restriction>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:maxLength value="12" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          <xs:pattern value="\*|([0-9]+[.]\*)|([0-9]+[.][0-9]+r\*)|([0-9]+[.][0-9]+(r[0-9]+)?)" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!--DefinedProtocolsType-->
+
+  <xs:simpleType name="DefinedProtocolsType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="HTTPS" />
+      <xs:enumeration value="HTTP" />
+      <xs:enumeration value="HTTP-SOAP1.1" />
+      <xs:enumeration value="HTTPS-SOAP1.1" />
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!--ExtendedContentType-->
+
+  <xs:complexType name="ExtendedContentType">
+    <xs:complexContent mixed="true" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:restriction base="xs:anyType">
+        <xs:sequence>
+          <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+
+
+  <!--SelectedContentType-->
+
+  <xs:complexType name="SelectedContentType">
+    <xs:complexContent mixed="true" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:restriction base="xs:anyType">
+        <xs:sequence>
+          <xs:any namespace="##other" processContents="skip" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+
+
+  <!--ObjectType-->
+
+  <xs:complexType name="ObjectType">
+    <xs:sequence>
+      <xs:any namespace="##other" processContents="lax" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

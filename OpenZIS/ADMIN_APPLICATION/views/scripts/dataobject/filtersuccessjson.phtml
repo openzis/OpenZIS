@@ -1,0 +1,105 @@
+[{
+id: 'data_objects_node',
+'cls':'folder',
+text: 'Data Objects',
+children: [
+<?php
+
+$childElementCounter = null;
+$childElementsSize = 0;
+$elementCounter = null;
+$elementsSize = 0;
+$permissionCounter = 0;
+$permissionsSize = count($this->permissions);
+
+foreach($this->permissions as $permission) {
+    $permissionCounter++;
+    echo "{text: '".$permission->objectName."',
+         'cls': 'folder',
+         children: [";
+
+    //parent elements start
+    $elementsSize = count($permission->dataElements);
+    $elementCounter = 0;
+    foreach($permission->dataElements as $dataElement) {
+        $elementCounter++;
+
+        if(hasChildren($dataElement)) {
+            echo buildParentElement($dataElement);
+
+            $childElementSize = count($dataElement->childElements);
+            $childElementCounter = 0;
+            foreach($dataElement->childElements as $childElement) {
+                $childElementCounter++;
+                echo buildChildElement($childElement, $dataElement);
+
+                if($childElementCounter == $childElementSize) {
+                    echo '}]';
+                }
+                else {
+                    echo '},';
+                }
+            }
+        }
+        else {
+            echo buildChildElement($dataElement);
+        }
+
+        if($elementCounter == $elementsSize) {
+            echo '}';
+        }
+        else {
+            echo '},';
+        }
+    }
+    echo ']';
+    //parents elements end
+
+    if($permissionCounter == $permissionsSize) {
+        echo '}';
+    }
+    else {
+        echo '},';
+    }
+}
+
+function buildParentElement($element) {
+    $text = "{
+         text:'".$element->elementName."',
+         'cls':'folder',";
+
+    if($element->canFilter) {
+        $text .= "checked: ".Utility::convertBooleanToString($element->filtered).",";
+    }
+
+    $text .= "id:'".$element->elementId."',children:[";
+    return $text;
+}
+
+function buildChildElement($element, $parentElement=null) {
+    $text = "{
+             text: '".$element->elementName."',
+             leaf: true,
+             id: '".$element->elementId."',";
+
+    if($parentElement->filtered) {
+        $text .= "checked:true,disabled:true";
+    }
+    else {
+        $text .= "checked: ".Utility::convertBooleanToString($element->filtered);
+    }
+
+    return $text;
+}
+
+function hasChildren($element) {
+    if(count($element->childElements) > 0) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+?>
+]}]

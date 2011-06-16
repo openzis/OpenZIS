@@ -1,0 +1,2962 @@
+<!--
+		SIF Infrastructure Implementation Specification 2.5 (May 4, 2011) Infrastructure Version: 2.5-4
+	-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="http://www.sifinfo.org/infrastructure/2.x" xmlns:sif="http://www.sifinfo.org/infrastructure/2.x" elementFormDefault="qualified">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd.xml" />
+
+  <!--Infrastructure Common Elements-->
+
+
+  <!--SIF_ExtendedElements-->
+
+  <xs:complexType name="SIF_ExtendedElementsType">
+    <xs:sequence>
+      <xs:element name="SIF_ExtendedElement" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="sif:ExtendedContentType">
+              <xs:attribute name="Name" use="required" type="xs:normalizedString" />
+              <!--<xs:attribute ref="xsi:type" use="optional" />-->
+              <xs:attribute name="SIF_Action" use="optional">
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="Delete" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_ExtendedElements" type="sif:SIF_ExtendedElementsType">
+    <xs:key name="SIF_ExtendedElementsKey1">
+      <xs:selector xpath="./sif:SIF_ExtendedElement" />
+      <xs:field xpath="@Name" />
+    </xs:key>
+  </xs:element>
+
+
+  <!--SIF_Message-->
+
+  <xs:complexType name="SIF_MessageType">
+    <xs:choice>
+      <xs:element ref="sif:SIF_Ack" />
+      <xs:element ref="sif:SIF_Event" />
+      <xs:element ref="sif:SIF_Provide" />
+      <xs:element ref="sif:SIF_Provision" />
+      <xs:element ref="sif:SIF_Register" />
+      <xs:element ref="sif:SIF_Request" />
+      <xs:element ref="sif:SIF_Response" />
+      <xs:element ref="sif:SIF_Subscribe" />
+      <xs:element ref="sif:SIF_SystemControl" />
+      <xs:element ref="sif:SIF_Unprovide" />
+      <xs:element ref="sif:SIF_Unregister" />
+      <xs:element ref="sif:SIF_Unsubscribe" />
+      <xs:element ref="sif:SIF_ServiceInput" />
+      <xs:element ref="sif:SIF_ServiceOutput" />
+      <xs:element ref="sif:SIF_ServiceNotify" />
+    </xs:choice>
+    <!--<xs:attribute name="xmlns" use="optional" type="xs:anyURI" />-->
+    <xs:attribute name="Version" use="required" type="sif:VersionType" />
+  </xs:complexType>
+
+  <xs:element name="SIF_Message" type="sif:SIF_MessageType" />
+
+
+  <!--SIF_Header-->
+
+  <xs:complexType name="SIF_HeaderType">
+    <xs:sequence>
+      <xs:element name="SIF_MsgId" type="sif:MsgIdType" />
+      <xs:element name="SIF_Timestamp" type="xs:dateTime" />
+      <xs:element name="SIF_Security" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_SecureChannel">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_AuthenticationLevel" />
+                  <xs:element ref="sif:SIF_EncryptionLevel" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_SourceId">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_DestinationId" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Header" type="sif:SIF_HeaderType" />
+
+
+  <!--SIF_EncryptionLevel-->
+
+  <xs:simpleType name="SIF_EncryptionLevelType">
+    <xs:restriction base="xs:unsignedInt">
+      <xs:enumeration value="0" />
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="SIF_EncryptionLevel" type="sif:SIF_EncryptionLevelType" />
+
+
+  <!--SIF_AuthenticationLevel-->
+
+  <xs:simpleType name="SIF_AuthenticationLevelType">
+    <xs:restriction base="xs:unsignedInt">
+      <xs:enumeration value="0" />
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="SIF_AuthenticationLevel" type="sif:SIF_AuthenticationLevelType" />
+
+
+  <!--SIF_Contexts-->
+
+  <xs:complexType name="SIF_ContextsType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Context" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Contexts" type="sif:SIF_ContextsType" />
+
+
+  <!--SIF_Context-->
+
+  <xs:simpleType name="SIF_ContextType">
+    <xs:restriction>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="SIF_Context" type="sif:SIF_ContextType" />
+
+
+  <!--SIF_Protocol-->
+
+  <xs:complexType name="SIF_ProtocolType">
+    <xs:sequence>
+      <xs:element name="SIF_URL" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:anyURI">
+            <xs:maxLength value="256" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_Property" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Name">
+              <xs:simpleType>
+                <xs:restriction base="xs:token">
+                  <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="SIF_Value">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:maxLength value="256" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="Type" use="required">
+      <xs:simpleType>
+        <xs:union>
+          <xs:simpleType>
+            <xs:restriction base="sif:DefinedProtocolsType" />
+          </xs:simpleType>
+          <xs:simpleType>
+            <xs:restriction base="xs:token" />
+          </xs:simpleType>
+        </xs:union>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="Secure" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="Yes" />
+          <xs:enumeration value="No" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:element name="SIF_Protocol" type="sif:SIF_ProtocolType" />
+
+
+  <!--SIF_Status-->
+
+  <xs:complexType name="SIF_StatusType">
+    <xs:sequence>
+      <xs:element name="SIF_Code" type="sif:InfrastructureStatusCodeType" />
+      <xs:element name="SIF_Desc" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="1024" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_Data" minOccurs="0">
+        <xs:complexType>
+          <xs:choice>
+            <xs:element ref="sif:SIF_Message" />
+            <xs:element ref="sif:SIF_AgentACL" />
+            <xs:element ref="sif:SIF_ZoneStatus" />
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Status" type="sif:SIF_StatusType" />
+
+
+  <!--SIF_Error-->
+
+  <xs:complexType name="SIF_ErrorType">
+    <xs:sequence>
+      <xs:element name="SIF_Category" type="sif:InfrastructureErrorCategoryType" />
+      <xs:element name="SIF_Code">
+        <xs:simpleType>
+          <xs:union>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureXMLValidationErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureEncryptionErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureAuthenticationErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureAccessAndPermissionErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureRegistrationErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureProvisionErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureSubscriptionErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureRequestAndResponseErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureEventReportingAndProcessingErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureTransportErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureSystemErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureGenericMessageHandlingErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="xs:token" />
+            </xs:simpleType>
+          </xs:union>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_Desc">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="1024" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_ExtendedDesc" minOccurs="0" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Error" type="sif:SIF_ErrorType" />
+
+
+  <!--SIF_Query-->
+
+  <xs:complexType name="SIF_QueryType">
+    <xs:sequence>
+      <xs:element name="SIF_QueryObject">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Element" minOccurs="0" maxOccurs="unbounded" type="xs:normalizedString" />
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+        </xs:complexType>
+      </xs:element>
+      <xs:choice minOccurs="0">
+        <xs:element name="SIF_ConditionGroup">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="SIF_Conditions" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="SIF_Condition" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="SIF_Element" type="xs:normalizedString" />
+                          <xs:element name="SIF_Operator">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:token">
+                                <xs:enumeration value="EQ" />
+                                <xs:enumeration value="LT" />
+                                <xs:enumeration value="GT" />
+                                <xs:enumeration value="LE" />
+                                <xs:enumeration value="GE" />
+                                <xs:enumeration value="NE" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="SIF_Value" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="Type" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:token">
+                        <xs:enumeration value="And" />
+                        <xs:enumeration value="Or" />
+                        <xs:enumeration value="None" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="Type" use="required">
+              <xs:simpleType>
+                <xs:restriction base="xs:token">
+                  <xs:enumeration value="And" />
+                  <xs:enumeration value="Or" />
+                  <xs:enumeration value="None" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="SIF_Example" type="sif:ObjectType" />
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Query" type="sif:SIF_QueryType" />
+
+
+  <!--SIF_ExtendedQuery-->
+
+  <xs:complexType name="SIF_ExtendedQueryType">
+    <xs:sequence>
+      <xs:element name="SIF_DestinationProvider" minOccurs="0" type="xs:token" />
+      <xs:element name="SIF_Select">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Element" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:normalizedString">
+                    <xs:attribute name="Alias" use="optional">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:normalizedString">
+                          <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                    <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="Distinct" use="required" type="xs:boolean" />
+          <xs:attribute name="RowCount" use="required">
+            <xs:simpleType>
+              <xs:union>
+                <xs:simpleType>
+                  <xs:restriction base="xs:positiveInteger" />
+                </xs:simpleType>
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="All" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:union>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_From">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Join" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_JoinOn" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_LeftElement">
+                          <xs:complexType>
+                            <xs:simpleContent>
+                              <xs:extension base="xs:normalizedString">
+                                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                              </xs:extension>
+                            </xs:simpleContent>
+                          </xs:complexType>
+                        </xs:element>
+                        <xs:element name="SIF_RightElement">
+                          <xs:complexType>
+                            <xs:simpleContent>
+                              <xs:extension base="xs:normalizedString">
+                                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                              </xs:extension>
+                            </xs:simpleContent>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="Type" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="Inner" />
+                      <xs:enumeration value="LeftOuter" />
+                      <xs:enumeration value="RightOuter" />
+                      <xs:enumeration value="FullOuter" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_Where" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_ConditionGroup">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_Conditions" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Condition" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="SIF_Element">
+                                <xs:complexType>
+                                  <xs:simpleContent>
+                                    <xs:extension base="xs:normalizedString">
+                                      <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                                    </xs:extension>
+                                  </xs:simpleContent>
+                                </xs:complexType>
+                              </xs:element>
+                              <xs:element name="SIF_Operator">
+                                <xs:simpleType>
+                                  <xs:restriction base="xs:token">
+                                    <xs:enumeration value="EQ" />
+                                    <xs:enumeration value="LT" />
+                                    <xs:enumeration value="GT" />
+                                    <xs:enumeration value="LE" />
+                                    <xs:enumeration value="GE" />
+                                    <xs:enumeration value="NE" />
+                                  </xs:restriction>
+                                </xs:simpleType>
+                              </xs:element>
+                              <xs:element name="SIF_Value" type="xs:string" />
+                            </xs:sequence>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                      <xs:attribute name="Type" use="required">
+                        <xs:simpleType>
+                          <xs:restriction base="xs:token">
+                            <xs:enumeration value="And" />
+                            <xs:enumeration value="Or" />
+                            <xs:enumeration value="None" />
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="Type" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="And" />
+                      <xs:enumeration value="Or" />
+                      <xs:enumeration value="None" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_OrderBy" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Element" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:normalizedString">
+                    <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                    <xs:attribute name="Ordering" use="required">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:token">
+                          <xs:enumeration value="Ascending" />
+                          <xs:enumeration value="Descending" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_ExtendedQuery" type="sif:SIF_ExtendedQueryType" />
+
+
+  <!--SIF_ExtendedQueryResults-->
+
+  <xs:complexType name="SIF_ExtendedQueryResultsType">
+    <xs:sequence>
+      <xs:element name="SIF_ColumnHeaders">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Element" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:normalizedString">
+                    <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                    <xs:attribute name="Alias" use="optional">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:normalizedString">
+                          <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                    <!--<xs:attribute ref="xsi:type" use="optional" />-->
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_Rows">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="R" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="C" maxOccurs="unbounded" type="sif:SelectedContentType" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_ExtendedQueryResults" type="sif:SIF_ExtendedQueryResultsType" />
+
+
+  <!--Infrastructure Messages-->
+
+
+  <!--SIF_Ack-->
+
+  <xs:complexType name="SIF_AckType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_OriginalSourceId" nillable="true" type="xs:token" />
+      <xs:element name="SIF_OriginalMsgId" nillable="true" type="sif:MsgIdType" />
+      <xs:choice>
+        <xs:element ref="sif:SIF_Status" />
+        <xs:element ref="sif:SIF_Error" />
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Ack" type="sif:SIF_AckType" />
+
+
+  <!--SIF_Event-->
+
+  <xs:complexType name="SIF_EventType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_ObjectData">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_EventObject">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded" namespace="##any" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                <xs:attribute name="Action" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="Add" />
+                      <xs:enumeration value="Delete" />
+                      <xs:enumeration value="Change" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Event" type="sif:SIF_EventType" />
+
+
+  <!--SIF_Provide-->
+
+  <xs:complexType name="SIF_ProvideType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_Object" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_ExtendedQuerySupport" minOccurs="0" type="xs:boolean" />
+            <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Provide" type="sif:SIF_ProvideType" />
+
+
+  <!--SIF_Provision-->
+
+  <xs:complexType name="SIF_ProvisionType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_ProvideObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ExtendedQuerySupport" minOccurs="0" type="xs:boolean" />
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_SubscribeObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_PublishAddObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_PublishChangeObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_PublishDeleteObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_RequestObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ExtendedQuerySupport" minOccurs="0" type="xs:boolean" />
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_RespondObjects">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ExtendedQuerySupport" minOccurs="0" type="xs:boolean" />
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_ProvideService" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Service" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ServiceName" use="required" type="sif:ServiceNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_RespondService" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Service" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ServiceName" use="required" type="sif:ServiceNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_RequestService" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Service" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                  <xs:element name="SIF_Operations" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Operation" maxOccurs="unbounded" type="xs:token" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="ServiceName" use="required" type="sif:ServiceNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_SubscribeService" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Service" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                  <xs:element name="SIF_Operations" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Operation" maxOccurs="unbounded" type="xs:token" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="ServiceName" use="required" type="sif:ServiceNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Provision" type="sif:SIF_ProvisionType" />
+
+
+  <!--SIF_Register-->
+
+  <xs:complexType name="SIF_RegisterType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_Name">
+        <xs:simpleType>
+          <xs:restriction base="xs:normalizedString">
+            <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_Version" maxOccurs="unbounded" type="sif:VersionWithWildcardsType" />
+      <xs:element name="SIF_MaxBufferSize" type="xs:unsignedInt" />
+      <xs:element name="SIF_Mode">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Push" />
+            <xs:enumeration value="Pull" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element ref="sif:SIF_Protocol" minOccurs="0" />
+      <xs:element name="SIF_NodeVendor" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:normalizedString">
+            <xs:maxLength value="256" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_NodeVersion" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:normalizedString">
+            <xs:maxLength value="32" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_Application" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Vendor">
+              <xs:simpleType>
+                <xs:restriction base="xs:normalizedString">
+                  <xs:maxLength value="256" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="SIF_Product">
+              <xs:simpleType>
+                <xs:restriction base="xs:normalizedString">
+                  <xs:maxLength value="256" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="SIF_Version">
+              <xs:simpleType>
+                <xs:restriction base="xs:normalizedString">
+                  <xs:maxLength value="32" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_Icon" minOccurs="0" type="xs:anyURI" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Register" type="sif:SIF_RegisterType" />
+
+
+  <!--SIF_Request-->
+
+  <xs:complexType name="SIF_RequestType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_Version" maxOccurs="unbounded" type="sif:VersionWithWildcardsType" />
+      <xs:element name="SIF_MaxBufferSize" type="xs:unsignedInt" />
+      <xs:choice>
+        <xs:element ref="sif:SIF_Query" />
+        <xs:element ref="sif:SIF_ExtendedQuery" />
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Request" type="sif:SIF_RequestType" />
+
+
+  <!--SIF_Response-->
+
+  <xs:complexType name="SIF_ResponseType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_RequestMsgId" type="sif:MsgIdType" />
+      <xs:element name="SIF_PacketNumber" type="xs:positiveInteger" />
+      <xs:element name="SIF_MorePackets">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Yes" />
+            <xs:enumeration value="No" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:choice>
+        <xs:element ref="sif:SIF_Error" />
+        <xs:element name="SIF_ObjectData" type="sif:ObjectType" />
+        <xs:element ref="sif:SIF_ExtendedQueryResults" />
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Response" type="sif:SIF_ResponseType" />
+
+
+  <!--SIF_Subscribe-->
+
+  <xs:complexType name="SIF_SubscribeType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_Object" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Subscribe" type="sif:SIF_SubscribeType" />
+
+
+  <!--SIF_SystemControl-->
+
+  <xs:complexType name="SIF_SystemControlType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_SystemControlData">
+        <xs:complexType>
+          <xs:choice>
+            <xs:element ref="sif:SIF_Ping" />
+            <xs:element ref="sif:SIF_Sleep" />
+            <xs:element ref="sif:SIF_Wakeup" />
+            <xs:element ref="sif:SIF_GetMessage" />
+            <xs:element ref="sif:SIF_GetZoneStatus" />
+            <xs:element ref="sif:SIF_GetAgentACL" />
+            <xs:element ref="sif:SIF_CancelRequests" />
+            <xs:element ref="sif:SIF_CancelServiceInputs" />
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_SystemControl" type="sif:SIF_SystemControlType" />
+
+
+  <!--SIF_Ping-->
+
+  <xs:complexType name="SIF_PingType" />
+
+  <xs:element name="SIF_Ping" type="sif:SIF_PingType" />
+
+
+  <!--SIF_Sleep-->
+
+  <xs:complexType name="SIF_SleepType" />
+
+  <xs:element name="SIF_Sleep" type="sif:SIF_SleepType" />
+
+
+  <!--SIF_Wakeup-->
+
+  <xs:complexType name="SIF_WakeupType" />
+
+  <xs:element name="SIF_Wakeup" type="sif:SIF_WakeupType" />
+
+
+  <!--SIF_GetMessage-->
+
+  <xs:complexType name="SIF_GetMessageType" />
+
+  <xs:element name="SIF_GetMessage" type="sif:SIF_GetMessageType" />
+
+
+  <!--SIF_GetZoneStatus-->
+
+  <xs:complexType name="SIF_GetZoneStatusType" />
+
+  <xs:element name="SIF_GetZoneStatus" type="sif:SIF_GetZoneStatusType" />
+
+
+  <!--SIF_GetAgentACL-->
+
+  <xs:complexType name="SIF_GetAgentACLType" />
+
+  <xs:element name="SIF_GetAgentACL" type="sif:SIF_GetAgentACLType" />
+
+
+  <!--SIF_CancelRequests-->
+
+  <xs:complexType name="SIF_CancelRequestsType">
+    <xs:sequence>
+      <xs:element name="SIF_NotificationType">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Standard" />
+            <xs:enumeration value="None" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_RequestMsgIds">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_RequestMsgId" maxOccurs="unbounded" type="sif:MsgIdType" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_CancelRequests" type="sif:SIF_CancelRequestsType" />
+
+
+  <!--SIF_CancelServiceInputs-->
+
+  <xs:complexType name="SIF_CancelServiceInputsType">
+    <xs:sequence>
+      <xs:element name="SIF_NotificationType">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Standard" />
+            <xs:enumeration value="None" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_ServiceMsgIds">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_ServiceMsgId" maxOccurs="unbounded" type="sif:MsgIdType" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_CancelServiceInputs" type="sif:SIF_CancelServiceInputsType" />
+
+
+  <!--SIF_Unprovide-->
+
+  <xs:complexType name="SIF_UnprovideType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_Object" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Unprovide" type="sif:SIF_UnprovideType" />
+
+
+  <!--SIF_Unregister-->
+
+  <xs:complexType name="SIF_UnregisterType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Unregister" type="sif:SIF_UnregisterType" />
+
+
+  <!--SIF_Unsubscribe-->
+
+  <xs:complexType name="SIF_UnsubscribeType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_Object" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_Unsubscribe" type="sif:SIF_UnsubscribeType" />
+
+
+  <!--SIF_ServiceInput-->
+
+  <xs:complexType name="SIF_ServiceInputType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_Service" type="sif:ServiceNameType" />
+      <xs:element name="SIF_Operation" type="sif:ServiceNameType" />
+      <xs:element name="SIF_ServiceMsgId" type="sif:GUIDType" />
+      <xs:element name="SIF_Version" minOccurs="0" maxOccurs="unbounded" type="sif:VersionWithWildcardsType" />
+      <xs:element name="SIF_MaxBufferSize" minOccurs="0" type="xs:unsignedInt" />
+      <xs:element name="SIF_PacketNumber" type="xs:positiveInteger" />
+      <xs:element name="SIF_MorePackets">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Yes" />
+            <xs:enumeration value="No" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:choice>
+        <xs:element ref="sif:SIF_Error" />
+        <xs:element name="SIF_Body">
+          <xs:complexType xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:sequence>
+              <xs:any processContents="lax" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_ServiceInput" type="sif:SIF_ServiceInputType" />
+
+
+  <!--SIF_ServiceOutput-->
+
+  <xs:complexType name="SIF_ServiceOutputType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_ServiceMsgId" type="sif:GUIDType" />
+      <xs:element name="SIF_PacketNumber" type="xs:positiveInteger" />
+      <xs:element name="SIF_MorePackets">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Yes" />
+            <xs:enumeration value="No" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:choice>
+        <xs:element ref="sif:SIF_Error" />
+        <xs:element name="SIF_Body">
+          <xs:complexType xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:sequence>
+              <xs:any processContents="lax" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_ServiceOutput" type="sif:SIF_ServiceOutputType" />
+
+
+  <!--SIF_ServiceNotify-->
+
+  <xs:complexType name="SIF_ServiceNotifyType">
+    <xs:sequence>
+      <xs:element ref="sif:SIF_Header" />
+      <xs:element name="SIF_Service" type="sif:ServiceNameType" />
+      <xs:element name="SIF_Operation" />
+      <xs:element name="SIF_ServiceMsgId" type="sif:GUIDType" />
+      <xs:element name="SIF_PacketNumber" type="xs:positiveInteger" />
+      <xs:element name="SIF_MorePackets">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Yes" />
+            <xs:enumeration value="No" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:choice>
+        <xs:element ref="sif:SIF_Error" />
+        <xs:element name="SIF_Body">
+          <xs:complexType xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:sequence>
+              <xs:any processContents="lax" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_ServiceNotify" type="sif:SIF_ServiceNotifyType" />
+
+
+  <!--Infrastructure Data Objects-->
+
+
+  <!--SIF_AgentACL-->
+
+  <xs:complexType name="SIF_AgentACLType">
+    <xs:sequence>
+      <xs:element name="SIF_ProvideAccess" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_SubscribeAccess" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_PublishAddAccess" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_PublishChangeAccess" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_PublishDeleteAccess" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_RequestAccess" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_RespondAccess" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_ProvideService" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Service" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ServiceName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_RespondService" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Service" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                </xs:sequence>
+                <xs:attribute name="ServiceName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_RequestService" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Service" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                  <xs:element name="SIF_Operations" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Operation" minOccurs="0" maxOccurs="unbounded" type="xs:token" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="ServiceName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_SubscribeService" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Service" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                  <xs:element name="SIF_Operations" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Operation" minOccurs="0" maxOccurs="unbounded" type="xs:token" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="ServiceName" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_Metadata" minOccurs="0">
+        <xs:complexType xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          <xs:sequence>
+            <xs:any minOccurs="0" maxOccurs="unbounded" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element ref="sif:SIF_ExtendedElements" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="SIF_AgentACL" type="sif:SIF_AgentACLType" />
+
+
+  <!--SIF_LogEntry-->
+
+  <xs:complexType name="SIF_LogEntryType">
+    <xs:sequence>
+      <xs:element name="SIF_LogEntryHeader" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sif:SIF_Header" minOccurs="0" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_OriginalHeader" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sif:SIF_Header" minOccurs="0" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_Category" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="1" />
+            <xs:enumeration value="2" />
+            <xs:enumeration value="3" />
+            <xs:enumeration value="4" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_Code" minOccurs="0">
+        <xs:simpleType>
+          <xs:union>
+            <xs:simpleType>
+              <xs:restriction base="sif:SIF_LogEntrySuccessCategoryType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:SIF_LogEntryDataIssuesWithSuccessResultType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:SIF_LogEntryDataIssuesWithFailureResultType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:SIF_LogEntryAgentErrorConditionType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:SIF_LogEntryZISErrorConditionType" />
+            </xs:simpleType>
+          </xs:union>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_ApplicationCode" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:normalizedString">
+            <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_Desc" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="1024" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_ExtendedDesc" minOccurs="0" type="xs:string" />
+      <xs:element name="SIF_LogObjects" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_LogObject" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xs:sequence>
+                  <xs:any processContents="skip" />
+                </xs:sequence>
+                <xs:attribute name="ObjectName" use="required" type="xs:NCName" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_Metadata" minOccurs="0">
+        <xs:complexType xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          <xs:sequence>
+            <xs:any minOccurs="0" maxOccurs="unbounded" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element ref="sif:SIF_ExtendedElements" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="Source" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="Agent" />
+          <xs:enumeration value="ZIS" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="LogLevel" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="Info" />
+          <xs:enumeration value="Warning" />
+          <xs:enumeration value="Error" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:element name="SIF_LogEntry" type="sif:SIF_LogEntryType" />
+
+
+  <!--SIF_ZoneStatus-->
+
+  <xs:complexType name="SIF_ZoneStatusType">
+    <xs:sequence>
+      <xs:element name="SIF_Name" minOccurs="0" type="xs:normalizedString" />
+      <xs:element name="SIF_Icon" minOccurs="0" type="xs:anyURI" />
+      <xs:element name="SIF_Vendor" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Name" minOccurs="0" type="xs:normalizedString" />
+            <xs:element name="SIF_Product" minOccurs="0" type="xs:normalizedString" />
+            <xs:element name="SIF_Version" minOccurs="0" type="xs:normalizedString" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_Providers" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Provider" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ObjectList" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="SIF_ExtendedQuerySupport" minOccurs="0" type="xs:boolean" />
+                              <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                            </xs:sequence>
+                            <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="SourceId" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_Subscribers" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Subscriber" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ObjectList" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                            </xs:sequence>
+                            <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="SourceId" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_AddPublishers" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Publisher" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ObjectList" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                            </xs:sequence>
+                            <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="SourceId" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_ChangePublishers" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Publisher" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ObjectList" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                            </xs:sequence>
+                            <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="SourceId" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_DeletePublishers" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Publisher" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ObjectList" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                            </xs:sequence>
+                            <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="SourceId" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_Responders" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Responder" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ObjectList" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="SIF_ExtendedQuerySupport" minOccurs="0" type="xs:boolean" />
+                              <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                            </xs:sequence>
+                            <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="SourceId" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_Requesters" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Requester" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ObjectList" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Object" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="SIF_ExtendedQuerySupport" minOccurs="0" type="xs:boolean" />
+                              <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                            </xs:sequence>
+                            <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="SourceId" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_SIFNodes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_SIFNode" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_Name" minOccurs="0" type="xs:normalizedString" />
+                  <xs:element name="SIF_Icon" minOccurs="0" type="xs:anyURI" />
+                  <xs:element name="SIF_NodeVendor" minOccurs="0">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:normalizedString">
+                        <xs:maxLength value="256" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:element>
+                  <xs:element name="SIF_NodeVersion" minOccurs="0">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:normalizedString">
+                        <xs:maxLength value="32" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:element>
+                  <xs:element name="SIF_Application" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Vendor" minOccurs="0">
+                          <xs:simpleType>
+                            <xs:restriction base="xs:normalizedString">
+                              <xs:maxLength value="256" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="SIF_Product" minOccurs="0">
+                          <xs:simpleType>
+                            <xs:restriction base="xs:normalizedString">
+                              <xs:maxLength value="256" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="SIF_Version" minOccurs="0">
+                          <xs:simpleType>
+                            <xs:restriction base="xs:normalizedString">
+                              <xs:maxLength value="32" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="SIF_SourceId" minOccurs="0">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:token">
+                        <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:element>
+                  <xs:element name="SIF_Mode" minOccurs="0">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:token">
+                        <xs:enumeration value="Push" />
+                        <xs:enumeration value="Pull" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:element>
+                  <xs:element ref="sif:SIF_Protocol" minOccurs="0" />
+                  <xs:element name="SIF_VersionList" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Version" minOccurs="0" maxOccurs="unbounded" type="sif:VersionWithWildcardsType" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element ref="sif:SIF_AuthenticationLevel" minOccurs="0" />
+                  <xs:element ref="sif:SIF_EncryptionLevel" minOccurs="0" />
+                  <xs:element name="SIF_MaxBufferSize" minOccurs="0" type="xs:unsignedInt" />
+                  <xs:element name="SIF_Sleeping" minOccurs="0">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:token">
+                        <xs:enumeration value="No" />
+                        <xs:enumeration value="Yes" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="Type" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="Agent" />
+                      <xs:enumeration value="ZIS" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_SupportedAuthentication" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_ProtocolName" minOccurs="0" maxOccurs="unbounded">
+              <xs:simpleType>
+                <xs:restriction base="xs:token">
+                  <xs:enumeration value="X.509" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_SupportedProtocols" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sif:SIF_Protocol" minOccurs="0" maxOccurs="unbounded" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_SupportedVersions" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Version" minOccurs="0" maxOccurs="unbounded" type="sif:VersionType" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_AdministrationURL" minOccurs="0" type="xs:anyURI" />
+      <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+      <xs:element name="SIF_ServiceProviders" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_ServiceProvider" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ServiceList" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Service" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                            </xs:sequence>
+                            <xs:attribute name="ServiceName" use="required" type="xs:token" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="SourceId" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_ServiceResponders" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_ServiceResponder" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ServiceList" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Service" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                            </xs:sequence>
+                            <xs:attribute name="ServiceName" use="required" type="xs:token" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="SourceId" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_ServiceRequesters" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_ServiceRequester" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ServiceList" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Service" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="SIF_Operations" minOccurs="0">
+                                <xs:complexType>
+                                  <xs:sequence>
+                                    <xs:element name="SIF_Operation" minOccurs="0" maxOccurs="unbounded" type="xs:token" />
+                                  </xs:sequence>
+                                </xs:complexType>
+                              </xs:element>
+                              <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                            </xs:sequence>
+                            <xs:attribute name="ServiceName" use="required" type="xs:token" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="SourceId" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_ServiceSubscribers" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_ServiceSubscriber" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_ServiceList" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Service" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="SIF_Operations" minOccurs="0">
+                                <xs:complexType>
+                                  <xs:sequence>
+                                    <xs:element name="SIF_Operation" minOccurs="0" maxOccurs="unbounded" type="xs:token" />
+                                  </xs:sequence>
+                                </xs:complexType>
+                              </xs:element>
+                              <xs:element ref="sif:SIF_Contexts" minOccurs="0" />
+                            </xs:sequence>
+                            <xs:attribute name="ServiceName" use="required" type="xs:token" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="SourceId" use="required" type="xs:token" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_Metadata" minOccurs="0">
+        <xs:complexType xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          <xs:sequence>
+            <xs:any minOccurs="0" maxOccurs="unbounded" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element ref="sif:SIF_ExtendedElements" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="ZoneId" use="required" type="xs:token" />
+  </xs:complexType>
+
+  <xs:element name="SIF_ZoneStatus" type="sif:SIF_ZoneStatusType">
+    <xs:unique name="SIF_ZoneStatusKey1">
+      <xs:selector xpath="." />
+      <xs:field xpath="@ZoneId" />
+    </xs:unique>
+  </xs:element>
+
+
+  <!--Data Model Common Elements-->
+
+  <xs:simpleType name="InfrastructureStatusCodeType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="0" />
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="8" />
+      <xs:enumeration value="9" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureErrorCategoryType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="0" />
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="5" />
+      <xs:enumeration value="6" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="8" />
+      <xs:enumeration value="9" />
+      <xs:enumeration value="10" />
+      <xs:enumeration value="11" />
+      <xs:enumeration value="12" />
+      <xs:enumeration value="13" />
+      <xs:enumeration value="14" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureXMLValidationErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="6" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureEncryptionErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureAuthenticationErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="5" />
+      <xs:enumeration value="6" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="8" />
+      <xs:enumeration value="9" />
+      <xs:enumeration value="10" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureAccessAndPermissionErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="5" />
+      <xs:enumeration value="6" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="8" />
+      <xs:enumeration value="9" />
+      <xs:enumeration value="10" />
+      <xs:enumeration value="11" />
+      <xs:enumeration value="12" />
+      <xs:enumeration value="13" />
+      <xs:enumeration value="14" />
+      <xs:enumeration value="15" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureRegistrationErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="6" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="9" />
+      <xs:enumeration value="10" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureProvisionErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureSubscriptionErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureRequestAndResponseErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="8" />
+      <xs:enumeration value="9" />
+      <xs:enumeration value="10" />
+      <xs:enumeration value="11" />
+      <xs:enumeration value="12" />
+      <xs:enumeration value="13" />
+      <xs:enumeration value="14" />
+      <xs:enumeration value="15" />
+      <xs:enumeration value="16" />
+      <xs:enumeration value="17" />
+      <xs:enumeration value="18" />
+      <xs:enumeration value="19" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureEventReportingAndProcessingErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureTransportErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureSystemErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureGenericMessageHandlingErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="5" />
+      <xs:enumeration value="6" />
+      <xs:enumeration value="7" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureSMBErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InfrastructureSIFZoneServiceErrorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="5" />
+      <xs:enumeration value="6" />
+      <xs:enumeration value="7" />
+      <xs:enumeration value="8" />
+      <xs:enumeration value="9" />
+      <xs:enumeration value="10" />
+      <xs:enumeration value="11" />
+      <xs:enumeration value="12" />
+      <xs:enumeration value="13" />
+      <xs:enumeration value="14" />
+      <xs:enumeration value="15" />
+      <xs:enumeration value="16" />
+      <xs:enumeration value="17" />
+      <xs:enumeration value="18" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SIF_LogEntrySuccessCategoryType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SIF_LogEntryDataIssuesWithSuccessResultType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SIF_LogEntryDataIssuesWithFailureResultType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SIF_LogEntryAgentErrorConditionType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SIF_LogEntryZISErrorConditionType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+      <xs:enumeration value="3" />
+      <xs:enumeration value="4" />
+      <xs:enumeration value="5" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!--ReportPackageType-->
+
+  <xs:complexType name="ReportPackageType">
+    <xs:complexContent>
+      <xs:extension base="sif:AbstractContentPackageType" />
+    </xs:complexContent>
+  </xs:complexType>
+
+
+  <!--AbstractContentPackageType-->
+
+  <xs:complexType name="AbstractContentPackageType">
+    <xs:sequence>
+      <xs:choice>
+        <xs:element name="XMLData">
+          <xs:complexType>
+<xs:sequence>
+  <xs:any processContents="lax" xmlns:xs="http://www.w3.org/2001/XMLSchema"  minOccurs="0" maxOccurs="1"/>
+</xs:sequence>
+<xs:attribute name="Description" use="optional" type="xs:token" /></xs:complexType>
+        </xs:element>
+        <xs:element name="TextData">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute name="MIMEType" use="optional" type="xs:token" />
+                <xs:attribute name="FileName" use="optional" type="xs:token" />
+                <xs:attribute name="Description" use="optional" type="xs:token" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="BinaryData">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="sif:XSBase64BinaryOrEmpty">
+                <xs:attribute name="MIMEType" use="required" type="xs:token" />
+                <xs:attribute name="FileName" use="optional" type="xs:token" />
+                <xs:attribute name="Description" use="optional" type="xs:token" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Reference">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="URL" minOccurs="0" type="xs:anyURI" />
+            </xs:sequence>
+            <xs:attribute name="MIMEType" use="required" type="xs:token" />
+            <xs:attribute name="Description" use="optional" type="xs:token" />
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="RefId" use="required" type="sif:RefIdType" />
+  </xs:complexType>
+
+
+  <!--AbstractContentElementType-->
+
+  <xs:complexType name="AbstractContentElementType">
+    <xs:sequence>
+      <xs:choice>
+        <xs:element name="XMLData">
+          <xs:complexType>
+<xs:sequence>
+  <xs:any processContents="lax" xmlns:xs="http://www.w3.org/2001/XMLSchema"  minOccurs="0" maxOccurs="1"/>
+</xs:sequence>
+<xs:attribute name="Description" use="optional" type="xs:token" /></xs:complexType>
+        </xs:element>
+        <xs:element name="TextData">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute name="MIMEType" use="optional" type="xs:token" />
+                <xs:attribute name="FileName" use="optional" type="xs:token" />
+                <xs:attribute name="Description" use="optional" type="xs:token" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="BinaryData">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="sif:XSBase64BinaryOrEmpty">
+                <xs:attribute name="MIMEType" use="required" type="xs:token" />
+                <xs:attribute name="FileName" use="optional" type="xs:token" />
+                <xs:attribute name="Description" use="optional" type="xs:token" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Reference">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="URL" minOccurs="0" type="xs:anyURI" />
+            </xs:sequence>
+            <xs:attribute name="MIMEType" use="required" type="xs:token" />
+            <xs:attribute name="Description" use="optional" type="xs:token" />
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <!--ObjectNameType-->
+
+  <xs:simpleType name="ObjectNameType">
+    <xs:restriction>
+      <xs:simpleType>
+        <xs:restriction base="xs:NCName">
+          <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!--ServiceNameType-->
+
+  <xs:simpleType name="ServiceNameType">
+    <xs:restriction base="xs:NCName" />
+  </xs:simpleType>
+
+
+  <!--ObjectType-->
+
+  <xs:complexType name="ObjectType">
+    <xs:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded" namespace="##any" />
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <!--ReportDataObjectType-->
+
+  <xs:complexType name="ReportDataObjectType">
+    <xs:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <!--URIOrBinaryType-->
+
+  <xs:simpleType name="URIOrBinaryType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:anyURI" />
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:base64Binary" />
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+
+  <!--GUIDType-->
+
+  <xs:simpleType name="GUIDType">
+    <xs:restriction>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:pattern value="[0-9A-F]{32}" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!--MsgIdType-->
+
+  <xs:simpleType name="MsgIdType">
+    <xs:restriction base="sif:GUIDType" />
+  </xs:simpleType>
+
+
+  <!--RefIdType-->
+
+  <xs:simpleType name="RefIdType">
+    <xs:restriction base="sif:GUIDType" />
+  </xs:simpleType>
+
+
+  <!--IdRefType-->
+
+  <xs:simpleType name="IdRefType">
+    <xs:restriction base="sif:RefIdType" />
+  </xs:simpleType>
+
+
+  <!--VersionType-->
+
+  <xs:simpleType name="VersionType">
+    <xs:restriction>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:maxLength value="12" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          <xs:pattern value="[0-9]+[.][0-9]+(r[0-9]+)?" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!--VersionWithWildcardsType-->
+
+  <xs:simpleType name="VersionWithWildcardsType">
+    <xs:restriction>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:maxLength value="12" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          <xs:pattern value="\*|([0-9]+[.]\*)|([0-9]+[.][0-9]+r\*)|([0-9]+[.][0-9]+(r[0-9]+)?)" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!--DefinedProtocolsType-->
+
+  <xs:simpleType name="DefinedProtocolsType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="HTTPS" />
+      <xs:enumeration value="HTTP" />
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!--ExtendedContentType-->
+
+  <xs:complexType name="ExtendedContentType">
+    <xs:complexContent mixed="true" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:restriction base="xs:anyType">
+        <xs:sequence>
+          <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+
+
+  <!--SelectedContentType-->
+
+  <xs:complexType name="SelectedContentType">
+    <xs:complexContent mixed="true" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:restriction base="xs:anyType">
+        <xs:sequence>
+          <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+
+
+  <!--SIF_HeaderDataModelType-->
+
+  <xs:complexType name="SIF_HeaderDataModelType">
+    <xs:sequence>
+      <xs:element name="SIF_MsgId" minOccurs="0" type="sif:MsgIdType" />
+      <xs:element name="SIF_Timestamp" minOccurs="0" type="xs:dateTime" />
+      <xs:element name="SIF_Security" minOccurs="0" nillable="true">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_SecureChannel" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="sif:SIF_AuthenticationLevel" minOccurs="0" />
+                  <xs:element ref="sif:SIF_EncryptionLevel" minOccurs="0" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_SourceId" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_DestinationId" minOccurs="0" nillable="true">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_Contexts" minOccurs="0" nillable="true" type="sif:SIF_ContextsType" />
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <!--SIF_ErrorDataModelType-->
+
+  <xs:complexType name="SIF_ErrorDataModelType">
+    <xs:sequence>
+      <xs:element name="SIF_Category" minOccurs="0" type="sif:InfrastructureErrorCategoryType" />
+      <xs:element name="SIF_Code" minOccurs="0">
+        <xs:simpleType>
+          <xs:union>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureXMLValidationErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureEncryptionErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureAuthenticationErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureAccessAndPermissionErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureRegistrationErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureProvisionErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureSubscriptionErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureRequestAndResponseErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureEventReportingAndProcessingErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureTransportErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureSystemErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="sif:InfrastructureGenericMessageHandlingErrorType" />
+            </xs:simpleType>
+            <xs:simpleType>
+              <xs:restriction base="xs:token" />
+            </xs:simpleType>
+          </xs:union>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_Desc" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="1024" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="SIF_ExtendedDesc" minOccurs="0" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <!--SIF_QueryDataModelType-->
+
+  <xs:complexType name="SIF_QueryDataModelType">
+    <xs:sequence>
+      <xs:element name="SIF_QueryObject" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Element" minOccurs="0" maxOccurs="unbounded" type="xs:normalizedString" />
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+        </xs:complexType>
+      </xs:element>
+      <xs:choice minOccurs="0">
+        <xs:element name="SIF_ConditionGroup" minOccurs="0" nillable="true">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="SIF_Conditions" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="SIF_Condition" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="SIF_Element" minOccurs="0" type="xs:normalizedString" />
+                          <xs:element name="SIF_Operator" minOccurs="0">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:token">
+                                <xs:enumeration value="EQ" />
+                                <xs:enumeration value="LT" />
+                                <xs:enumeration value="GT" />
+                                <xs:enumeration value="LE" />
+                                <xs:enumeration value="GE" />
+                                <xs:enumeration value="NE" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="SIF_Value" minOccurs="0" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="Type" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:token">
+                        <xs:enumeration value="And" />
+                        <xs:enumeration value="Or" />
+                        <xs:enumeration value="None" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="Type" use="required">
+              <xs:simpleType>
+                <xs:restriction base="xs:token">
+                  <xs:enumeration value="And" />
+                  <xs:enumeration value="Or" />
+                  <xs:enumeration value="None" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="SIF_Example" minOccurs="0" nillable="true" type="sif:ObjectType" />
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <!--SIF_ExtendedQueryDataModelType-->
+
+  <xs:complexType name="SIF_ExtendedQueryDataModelType">
+    <xs:sequence>
+      <xs:element name="SIF_DestinationProvider" minOccurs="0" nillable="true" type="xs:token" />
+      <xs:element name="SIF_Select" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Element" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:normalizedString">
+                    <xs:attribute name="Alias" use="optional">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:normalizedString">
+                          <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                    <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="Distinct" use="required" type="xs:boolean" />
+          <xs:attribute name="RowCount" use="required">
+            <xs:simpleType>
+              <xs:union>
+                <xs:simpleType>
+                  <xs:restriction base="xs:positiveInteger" />
+                </xs:simpleType>
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="All" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:union>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_From" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Join" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_JoinOn" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_LeftElement" minOccurs="0">
+                          <xs:complexType>
+                            <xs:simpleContent>
+                              <xs:extension base="xs:normalizedString">
+                                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                              </xs:extension>
+                            </xs:simpleContent>
+                          </xs:complexType>
+                        </xs:element>
+                        <xs:element name="SIF_RightElement" minOccurs="0">
+                          <xs:complexType>
+                            <xs:simpleContent>
+                              <xs:extension base="xs:normalizedString">
+                                <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                              </xs:extension>
+                            </xs:simpleContent>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="Type" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="Inner" />
+                      <xs:enumeration value="LeftOuter" />
+                      <xs:enumeration value="RightOuter" />
+                      <xs:enumeration value="FullOuter" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_Where" minOccurs="0" nillable="true">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_ConditionGroup" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="SIF_Conditions" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="SIF_Condition" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="SIF_Element" minOccurs="0">
+                                <xs:complexType>
+                                  <xs:simpleContent>
+                                    <xs:extension base="xs:normalizedString">
+                                      <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                                    </xs:extension>
+                                  </xs:simpleContent>
+                                </xs:complexType>
+                              </xs:element>
+                              <xs:element name="SIF_Operator" minOccurs="0">
+                                <xs:simpleType>
+                                  <xs:restriction base="xs:token">
+                                    <xs:enumeration value="EQ" />
+                                    <xs:enumeration value="LT" />
+                                    <xs:enumeration value="GT" />
+                                    <xs:enumeration value="LE" />
+                                    <xs:enumeration value="GE" />
+                                    <xs:enumeration value="NE" />
+                                  </xs:restriction>
+                                </xs:simpleType>
+                              </xs:element>
+                              <xs:element name="SIF_Value" minOccurs="0" type="xs:string" />
+                            </xs:sequence>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                      <xs:attribute name="Type" use="required">
+                        <xs:simpleType>
+                          <xs:restriction base="xs:token">
+                            <xs:enumeration value="And" />
+                            <xs:enumeration value="Or" />
+                            <xs:enumeration value="None" />
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="Type" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="And" />
+                      <xs:enumeration value="Or" />
+                      <xs:enumeration value="None" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_OrderBy" minOccurs="0" nillable="true">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Element" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:normalizedString">
+                    <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                    <xs:attribute name="Ordering" use="required">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:token">
+                          <xs:enumeration value="Ascending" />
+                          <xs:enumeration value="Descending" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <!--SIF_ExtendedQueryResultsDataModelType-->
+
+  <xs:complexType name="SIF_ExtendedQueryResultsDataModelType">
+    <xs:sequence>
+      <xs:element name="SIF_ColumnHeaders" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="SIF_Element" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:normalizedString">
+                    <xs:attribute name="ObjectName" use="required" type="sif:ObjectNameType" />
+                    <xs:attribute name="Alias" use="optional">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:normalizedString">
+                          <xs:maxLength value="64" xmlns:xs="http://www.w3.org/2001/XMLSchema" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                    <!--<xs:attribute ref="xsi:type" use="optional" />-->
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SIF_Rows" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="R" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="C" minOccurs="0" maxOccurs="unbounded" type="sif:SelectedContentType" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!--XSBase64BinaryOrEmpty-->
+
+<xs:simpleType name="XSBase64BinaryOrEmpty">
+  <xs:union>
+    <xs:simpleType>
+      <xs:restriction base="xs:base64Binary" />
+    </xs:simpleType>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:length value="0" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:union>
+</xs:simpleType>
+
+</xs:schema>

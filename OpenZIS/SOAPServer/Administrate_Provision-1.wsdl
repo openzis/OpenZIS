@@ -1,0 +1,466 @@
+<!-- 
+	Administrate_Provision WSDL
+	
+	The Administrate_Provision Service interface is supported by the ZIS (mandatory).  
+	
+	There is a single Port Type, and it is bound to SOAP 1.1. The Service has its URL address 
+	set to the anonymous URI. The developer need only set this address to the actual URL that the 
+	service will be deployed at and this WSDL file will be complete.  It is recommended that this
+	URL be identical to that of all other SIF Web Service interfaces supported by the ZIS 
+	implementation it encapsulates.
+	
+	This SIF Infrastructure Web Service (SIWS) encapsulates the set of ZIS operations which
+	can be invoked by SIF Application Web Clients (SAWCs) to register and provision themselves 
+	as users and suppliers of Zone resources, to access Zone administrative data, and to control 
+	the flow of  messages from this and other ZIS-provided Web Services.  
+	
+	The meaning of each operation and the required choreography between them exactly parallel
+	the equivalent ZIS-supported methods provided over the HTTP/S transport.  
+	
+	
+	Namespaces:
+	tns:  Administrate_Provision WSDL
+	comm: SIF Common WSDL Messages
+	sift: SIFHeader XSD
+	sifm: SIF Message XSD (independent of Data Model)
+	
+-->
+
+<definitions
+	name="Administrate_Provision"
+	targetNamespace="http://www.sifassociation.org/contract/Administrate_Provision/2.x"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:tns="http://www.sifassociation.org/contract/Administrate_Provision/2.x"
+	
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	
+	xmlns:comm="http://www.sifassociation.org/contract/Common/2.x" 
+	xmlns:sift="http://www.sifassociation.org/transport/soap/2.x"
+	xmlns:sifm="http://www.sifassociation.org/message/soap/2.x"
+	xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"
+	
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+	
+	>
+	
+	<documentation>Version 2.5</documentation>
+
+	<!-- Import Common WSDL with messages -->
+	<import namespace="http://www.sifassociation.org/contract/Common/2.x" 
+		location="Common-7.wsdl"/>
+
+	<types>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://www.sifassociation.org/contract/Administrate_Provision/2.x"
+			xmlns="http://www.sifassociation.org/contract/Administrate_Provision/2.x"
+			elementFormDefault="qualified">
+			<xs:import namespace="http://www.sifassociation.org/transport/soap/2.x"
+				schemaLocation="Transport-1.xsd"></xs:import>
+			<xs:import namespace="http://www.sifassociation.org/message/soap/2.x"
+				schemaLocation="Messaging-1.xsd"></xs:import>
+			
+			<!-- The following imports may have to be done to satisfy tools which don't have these standard namespaces prestored:
+					soap-env, wsaw 
+				Other standard namespaces above (wsp, wsam, wsa, soap) may have to have imported contents as well 
+			<xs:import namespace="http://schemas.xmlsoap.org/soap/envelope/"
+				schemaLocation="http://schemas.xmlsoap.org/soap/envelope/"></xs:import>
+			<xs:import namespace="http://www.w3.org/2006/05/addressing/wsdl"
+				schemaLocation="http://www.w3.org/2007/02/addressing/metadata/ws-addr-metadata.xsd"></xs:import> 
+			-->				
+		</xs:schema>
+
+
+		<xs:documentation> The messages definitions need SIF Transport and Message Schemas. Both of
+			these are imported into the Administrate_Provision Port Type and Binding. </xs:documentation>
+
+		<xs:annotation>
+			<xs:documentation>
+				The following operations are supported by the Administrate_Provision ZIS Port
+				
+				Register
+				Unregister
+				Provide
+				Unprovide
+				Subscribe
+				Unsubscribe
+				Provision
+				GetZoneStatus
+				GetAgentACL
+				
+				Additionally, the following "cross service" Flow Control operations are also 
+				supported here.
+				
+				Ping
+				Sleep
+				Wakeup
+				
+			</xs:documentation>
+		</xs:annotation>
+		
+	</types>
+
+	<portType name="ptAdministrate_Provision">
+	
+
+		<!-- 1. Provisioning Messages -->
+
+		<operation name="Register">
+			<input name="RegisterRequest" message="comm:Register"/>
+			<output name="AgentACL" message="comm:AgentACL"/>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/Administrate_Provision/2.x/RegisterFault"
+				name="RegisterError" message="comm:TransportError"> </fault>
+		</operation>
+
+		<operation name="Unregister">
+			<input name="UnregisterRequest" message="comm:Unregister"/>
+			<output name="UnregisterStatus" message="comm:Status"/>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/Administrate_Provision/2.x/UnregisterFault"
+				name="UnregisterError" message="comm:TransportError"> </fault>
+		</operation>
+
+		<operation name="Provision">
+			<input name="ProvisionRequest" message="comm:Provision"/>
+			<output name="ProvisionStatus" message="comm:Status"/>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/Administrate_Provision/2.x/ProvisionFault"
+				name="ProvisionError" message="comm:TransportError"> </fault>
+		</operation>
+
+		<operation name="Provide">
+			<input name="ProvideRequest" message="comm:Provide"/>
+			<output name="ProvideStatus" message="comm:Status"/>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/Administrate_Provision/2.x/ProvideFault"
+				name="ProvideError" message="comm:TransportError"> </fault>
+		</operation>
+
+		<operation name="Unprovide">
+			<input name="UnprovideRequest" message="comm:Unprovide"/>
+			<output name="UnprovideStatus" message="comm:Status"/>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/Administrate_Provision/2.x/UnprovideFault"
+				name="UnprovideError" message="comm:TransportError"> </fault>
+		</operation>
+
+		<operation name="Subscribe">
+			<input name="SubscribeRequest" message="comm:Subscribe"/>
+			<output name="SubscribeStatus" message="comm:Status"/>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/Administrate_Provision/2.x/SubscribeFault"
+				name="SubscribeError" message="comm:TransportError"> </fault>
+		</operation>
+
+		<operation name="Unsubscribe">
+			<input name="UnsubscribeRequest" message="comm:Unsubscribe"/>
+			<output name="UnsubscribeStatus" message="comm:Status"/>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/Administrate_Provision/2.x/UnsubscribeFault"
+				name="UnsubscribeError" message="comm:TransportError"> </fault>
+		</operation>
+
+		<!-- 2. Get Administrative Data -->
+
+		<operation name="GetZoneStatus">
+			<input name="GetZoneStatus" message="comm:GetZoneStatus"/>
+			<output name="ZoneStatus" message="comm:ZoneStatus"/>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/Administrate_Provision/2.x/ZoneStatusFault"
+				name="ZoneStatusError" message="comm:TransportError"> </fault>
+		</operation>
+
+		<operation name="GetAgentACL">
+			<input name="GetAgentACL" message="comm:GetAgentACL"/>
+			<output name="AgentACL" message="comm:AgentACL"/>
+			<fault wsaw:Action="http://www.sifassociation.org/contract/Administrate_Provision/2.x/AgentACLFault"
+				name="AgentACLError" message="comm:TransportError"> </fault>
+		</operation>
+
+		<!-- 3. Flow Control  -->
+		
+		<operation name="Ping">
+			<input name="PingRequest" message="comm:Ping"></input>
+			<output name="PongResponse" message="comm:Status"></output>
+			<fault 
+				wsaw:Action="http://www.sifassociation.org/contract/FlowControl/2.x/PingFault"
+				name="PingError" message="comm:TransportError">
+			</fault>
+		</operation>
+		
+		<operation name="Sleep">
+			<input name="SleepRequest" message="comm:Sleep"></input>
+			<output name="SleepStatus" message="comm:Status"></output>
+			<fault
+				wsaw:Action="http://www.sifassociation.org/contract/FlowControl/2.x/SleepFault"
+				name="SleepError" message="comm:TransportError">
+			</fault>
+		</operation>
+		
+		<operation name="Wakeup">
+			<input name="WakeupRequest" message="comm:Wakeup"></input>
+			<output name="WakeupStatus" message="comm:Status"></output>
+			<fault
+				wsaw:Action="http://www.sifassociation.org/contract/FlowControl/2.x/WakeupFault"
+				name="WakeupError" message="comm:TransportError">
+			</fault>
+		</operation>
+		
+		
+	</portType>
+
+	<!-- 
+		Basically we are enforcing WS-Addressing in the binding to this port type.
+		The wsa:Actions will be generated automatically according to the default algorithm
+		(targetnamespace/portname/operation name)
+		
+		Per Port
+			<wsp:Policy>
+				<wsam:Addressing>
+					<wsp:Policy><wsam:AnonymousResponses/></wsp:Policy>/>
+				</wsam:Addressing>
+			</wsp:Policy>
+			
+		Per Operation
+			<wsp:Policy>
+				<wsam:Addressing>
+					<wsp:Policy><wsam:AnonymousResponses/></wsp:Policy>/>
+				</wsam:Addressing>
+			</wsp:Policy>
+		
+		All operations will be anonymous (send back response on same HTTP channel). On some
+		platforms this doesn't inherit, and BP 1.2 requires this policy to be reasserted for
+		each operation.
+		
+		Because WS-Addressing is being used to define the actions, a SOAP Action does not
+		have to be defined for each operation. 
+		
+		<** Note:  Since Ws-Addressing issues remain, the Policy statements have all been removed,
+		   and each operation has been assigned a SOAP Action. 
+		   
+		   For the "Register" operation, this takes the following form.
+		
+		      soapAction="http://www.sifassociation.org/contract/Administrate_Provision-S11/2.x/Register"
+		**>
+	-->
+
+	<binding name="Administrate_Provision-S11" type="tns:ptAdministrate_Provision">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+		<!-- 1. Provisioning Messages -->
+
+		<operation name="Register">
+			<soap:operation
+				soapAction="http://www.sifassociation.org/contract/Administrate_Provision-S11/2.x/Register"
+				style="document"/>
+			<input name="RegisterRequest">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Register" part="hdr" use="literal"/>
+			</input>
+			<output name="AgentACL">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:AgentACL" part="hdr" use="literal"/>
+			</output>
+			<fault name="RegisterError">
+				<soap:fault name="RegisterError" use="literal"/>
+			</fault>
+		</operation>
+
+		<operation name="Unregister">
+			<soap:operation
+				soapAction="http://www.sifassociation.org/contract/Administrate_Provision-S11/2.x/Unregister"
+				style="document"/>
+			<input name="UnregisterRequest">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Unregister" part="hdr" use="literal"/>
+			</input>
+			<output name="UnregisterStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="UnregisterError">
+				<soap:fault name="UnregisterError" use="literal"/>
+			</fault>
+		</operation>
+
+		<operation name="Provision">
+			<soap:operation
+				soapAction="http://www.sifassociation.org/contract/Administrate_Provision-S11/2.x/Provision"
+				style="document"/>
+			<input name="ProvisionRequest">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Provision" part="hdr" use="literal"/>
+			</input>
+			<output name="ProvisionStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="ProvisionError">
+				<soap:fault name="ProvisionError" use="literal"/>
+			</fault>
+		</operation>
+
+		<operation name="Provide">
+			<soap:operation
+				soapAction="http://www.sifassociation.org/contract/Administrate_Provision-S11/2.x/Provide"
+				style="document"/>
+			<input name="ProvideRequest">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Provide" part="hdr" use="literal"/>
+			</input>
+			<output name="ProvideStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="ProvideError">
+				<soap:fault name="ProvideError" use="literal"/>
+			</fault>
+		</operation>
+
+		<operation name="Unprovide">
+			<soap:operation
+				soapAction="http://www.sifassociation.org/contract/Administrate_Provision-S11/2.x/Unprovide"
+				style="document"/>
+			<input name="UnprovideRequest">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Unprovide" part="hdr" use="literal"/>
+			</input>
+			<output name="UnprovideStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="UnprovideError">
+				<soap:fault name="UnprovideError" use="literal"/>
+			</fault>
+		</operation>
+
+		<operation name="Subscribe">
+			<soap:operation
+				soapAction="http://www.sifassociation.org/contract/Administrate_Provision-S11/2.x/Subscribe"
+				style="document"/>
+			<input name="SubscribeRequest">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Subscribe" part="hdr" use="literal"/>
+			</input>
+			<output name="SubscribeStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="SubscribeError">
+				<soap:fault name="SubscribeError" use="literal"/>
+			</fault>
+		</operation>
+
+		<operation name="Unsubscribe">
+			<soap:operation
+				soapAction="http://www.sifassociation.org/contract/Administrate_Provision-S11/2.x/Unsubscribe"
+				style="document"/>
+			<input name="UnsubscribeRequest">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Unsubscribe" part="hdr" use="literal"/>
+			</input>
+			<output name="UnsubscribeStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="UnsubscribeError">
+				<soap:fault name="UnsubscribeError" use="literal"/>
+			</fault>
+		</operation>
+
+		<!-- 2. Get Administrative Data -->
+		
+		<operation name="GetZoneStatus">
+			<soap:operation
+				soapAction="http://www.sifassociation.org/contract/Administrate_Provision-S11/2.x/GetZoneStatus"
+				style="document"/>
+			<input name="GetZoneStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:GetZoneStatus" part="hdr" use="literal"/>
+			</input>
+			<output name="ZoneStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:ZoneStatus" part="hdr" use="literal"/>
+			</output>
+			<fault name="ZoneStatusError">
+				<soap:fault name="ZoneStatusError" use="literal"/>
+			</fault>
+		</operation>
+
+		<operation name="GetAgentACL">
+			<soap:operation
+				soapAction="http://www.sifassociation.org/contract/Administrate_Provision-S11/2.x/GetAgentACL"
+				style="document"/>
+			<input name="GetAgentACL">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:GetAgentACL" part="hdr" use="literal"/>
+			</input>
+			<output name="AgentACL">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:AgentACL" part="hdr" use="literal"/>
+			</output>
+			<fault name="AgentACLError">
+				<soap:fault name="AgentACLError" use="literal"/>
+			</fault>
+		</operation>
+		
+		<!-- 3. Flow Control Messages -->
+		
+		<operation name="Ping">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/FlowControl-S11/2.x/Ping" 
+				style="document"/>
+			<input name="PingRequest"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Ping" part="hdr" use="literal"/>
+			</input>
+			<output name="PongResponse">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="PingError">
+				<soap:fault name="PingError" use="literal"/>
+			</fault>
+		</operation>
+		
+		<operation name="Sleep">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/FlowControl-S11/2.x/Sleep" 
+				style="document"/>
+			<input name="SleepRequest"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Sleep" part="hdr" use="literal"/>
+			</input>
+			<output name="SleepStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="SleepError">
+				<soap:fault name="SleepError" use="literal"/>
+			</fault>
+		</operation>
+		
+		<operation name="Wakeup">
+			<soap:operation 
+				soapAction="http://www.sifassociation.org/contract/FlowControl-S11/2.x/Wakeup" 
+				style="document"/>
+			<input name="WakeupRequest"> 
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Wakeup" part="hdr" use="literal"/>
+			</input>
+			<output name="WakeupStatus">
+				<soap:body parts="bdy" use="literal"/>
+				<soap:header message="comm:Status" part="hdr" use="literal"/>
+			</output>
+			<fault name="WakeupError">
+				<soap:fault name="WakeupError" use="literal"/>
+			</fault>
+		</operation>
+	</binding>
+
+
+	<service name="Administrate_Provision">
+		<port name="Administrate_Provision-S11" binding="tns:Administrate_Provision-S11">
+
+			<!-- Anonymous URI - replace with deployed Administrate_Provision URL -->
+			<soap:address location="http://www.w3.org/2005/08/addressing/anonymous"/>
+
+		</port>
+	</service>
+
+</definitions>

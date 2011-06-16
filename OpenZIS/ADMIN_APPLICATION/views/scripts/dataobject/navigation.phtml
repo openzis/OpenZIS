@@ -1,0 +1,127 @@
+<?php
+
+$frontendOptions = array( 'lifetime' => Null );
+
+$backendOptions = array( 'cache_dir' => CACHE );
+
+$cache = Zend_Cache::factory('Output',
+                             'File',
+                             $frontendOptions,
+                             $backendOptions);
+$cacheID='DataObject1Navigation';
+
+
+if (!($cache->start($cacheID))) {
+?>[{
+		id: "versions_node",
+		"cls":"folder",
+		text:"Versions",
+		href:"javascript:dataObject.listAllVersions();",
+		children:[	
+<?php
+
+	$versions  = Version::getAllVersions();
+	$ver_size  = count($versions);
+	$ver_count = 1;
+	foreach($versions as $version){
+		if($version->hasDataObjectGroups()){
+			echo '{id: "versions_'.$version->desc.'_node",
+				  "cls":"folder",
+				   text:"'.$version->desc.'",
+				   href:"javascript:dataObject.listAllGroups('.$version->id.');",
+				   children:[
+				   {
+					 id: "groups_node_'.$version->id.'",
+					 "cls":"folder",
+					 text: "Groups",
+					 href:"javascript:dataObject.listAllGroups('.$version->id.');",
+					 children: [';
+			
+			$groups = DataObjectGroup::getAllDataObjectGroups_version($version->id);
+			$size = count($groups);
+			$counter = 1;
+			foreach($groups as $group){
+				if(DataObjectGroup::hasDataObjects($group->dataObjectGroupId)){
+					$dos = DataObjectGroup::getAllDataObjectsInGroup($group->dataObjectGroupId);
+					$size2 = count($dos);
+					$counter2 = 1;
+					
+					echo '{
+								id: '.$group->dataObjectGroupId.',
+								text: "'.$group->dataObjectGroupDesc.'",
+								"cls":"folder",
+								href:"javascript:dataObject.getAllDataObjects('.$group->dataObjectGroupId.')",
+								children: [';
+						
+						foreach($dos as $do){
+							if($counter2 == $size2){
+								echo '{
+										id: "'.$group->dataObjectGroupId.'_'.$do->dataObjectId.'",
+										text: "'.$do->dataObjectName.'",
+										leaf: true,
+										"cls":"file"
+									  }';
+							}
+							else{
+								
+								echo '{
+										id: "'.$group->dataObjectGroupId.'_'.$do->dataObjectId.'",
+										text: "'.$do->dataObjectName.'",
+										leaf: true,
+										"cls":"file"
+									 },';
+								
+							}
+							$counter2++;
+						}	
+					if($counter == $size){
+						 echo "]}]";
+					}
+					else{
+						echo "]},";
+					}
+				}
+				else{
+						echo '{
+								id: '.$group->dataObjectGroupId.',
+								text: "'.$group->dataObjectGroupDesc.'",
+								leaf: true,
+								"cls":"file",
+								href:"javascript:dataObject.getAllDataObjects('.$group->dataObjectGroupId.')"';
+						
+						if($counter == $size){
+						 echo "}]";
+						}
+						else{
+						 echo "},";
+						}
+				}
+				$counter++;
+			}
+			if($ver_count == $ver_size){
+				echo '}]}]';
+			}
+			else{
+				echo '}]},';
+			}
+			$ver_count++;
+		}
+		else{
+			echo '{id: "versions_'.$version->desc.'_node",
+				  "cls":"file",
+				  leaf: true,
+				  text:"'.$version->desc.'"';
+			if($ver_count == $ver_size){
+				echo '}]';
+			}
+			else{
+				echo '},';
+			}
+			$ver_count++;
+		}
+	}
+?>	
+}]
+<?php
+$cache->end();
+}
