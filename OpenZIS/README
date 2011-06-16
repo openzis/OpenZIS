@@ -1,0 +1,7 @@
+Support for US SIF Specification 1.5r1, 2.0r1, 2.1, 2.2, 2.3
+Support for UK SIF Specification 1.0, 1.1, 1.2
+Support for AU SIF Specification 1.0
+Pull and Push Messaging.
+Schema validation.
+Support for multiple zones.
+Web based configuration.
