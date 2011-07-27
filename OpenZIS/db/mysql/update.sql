@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS `zit_log_archive`;
 CREATE TABLE  `zit_log_archive` (
   `LOG_ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `CREATE_TIMESTAMP` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `REC_XML` meiumtext NOT NULL,
+  `REC_XML` mediumtext NOT NULL,
   `SENT_XML` mediumtext NOT NULL,
   `ZONE_ID` int(10) unsigned NOT NULL DEFAULT '0',
   `AGENT_ID` int(10) unsigned DEFAULT NULL,
